@@ -13,12 +13,6 @@ Please see [this repo](https://github.com/laravel-notification-channels/channels
 
 This package makes it easy to send notifications using [RuStore](link to service) with Laravel 10.x.
 
-**Note:** Replace ```RuStore``` ```RuStore``` ```yakOffKa``` ```yakoffka``` ```https://yakoffka.ru/``` ```yagithub@mail.ru``` ```ru-store``` ```RuStore push notifications channel for Laravel``` ```:style_ci_id``` ```:sensio_labs_id``` with their correct values in [README.md](README.md), [CHANGELOG.md](CHANGELOG.md), [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE.md](LICENSE.md), [composer.json](composer.json) and other files, then delete this line.
-**Tip:** Use "Find in Path/Files" in your code editor to find these keywords within the package directory and replace all occurences with your specified term.
-
-This is where your description should go. Add a little code example so build can understand real quick how the package can be used. Try and limit it to a paragraph or two.
-
-
 
 ## Contents
 
@@ -44,7 +38,21 @@ Optionally include a few steps how users can set up the service.
 
 ## Usage
 
-Some code examples, make it clear how to use the package
+В классе User необходимо реализовать метод, возвращающий массив токенов уведомляемого пользователя:
+
+```
+    /**
+     * Получение массива ru-store пуш-токенов.
+     * Используется пакетом laravel-notification-channels/rustore
+     *
+     * @return array
+     */
+    public function routeNotificationForRuStore(): array
+    {
+        return $this->ru_store_tokens;
+    }
+```
+
 
 ### Available Message methods
 
