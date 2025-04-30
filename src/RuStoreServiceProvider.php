@@ -4,7 +4,7 @@ namespace NotificationChannels\RuStore;
 
 use Illuminate\Support\ServiceProvider;
 
-class RuStoreMessageServiceProvider extends ServiceProvider
+class RuStoreServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
