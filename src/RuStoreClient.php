@@ -19,7 +19,10 @@ class RuStoreClient
 
     public function __construct()
     {
-        $this->url = sprintf(config('ru-store.url'), config('ru-store.project_id'));
+        $this->url = sprintf(
+            'https://vkpns.rustore.ru/v1/projects/%s/messages:send',
+            config('ru-store.project_id')
+        );
     }
 
     /**
