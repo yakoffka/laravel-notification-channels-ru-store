@@ -13,8 +13,8 @@ class MessageAndroid extends RuStoreResource
      * @param MessageAndroidNotification|null $notification Уведомление для отправки на устройства Android.
      */
     public function __construct(
-        public ?string                     $ttl,
-        public ?MessageAndroidNotification $notification
+        public ?string                     $ttl = null,
+        public ?MessageAndroidNotification $notification = null
     )
     {
     }
@@ -37,10 +37,6 @@ class MessageAndroid extends RuStoreResource
      */
     public function toArray(): array
     {
-        // return array_filter([
-        //     'ttl' => $this->ttl,
-        //     'notification' => $this->notification,
-        // ]);
         return array_filter(get_object_vars($this));
     }
 }

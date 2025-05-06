@@ -1,21 +1,20 @@
 <?php
+declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
 
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\Exceptions\CouldNotSendNotification;
 use Illuminate\Notifications\Notification;
+use Throwable;
 
 class RuStoreChannel
 {
-    public const MAX_PAYLOAD_LENGTH = 4078;
-
-    public function __construct()
-    {
-        // Initialisation code here
-    }
+    // @todo задействовать проверку максимального объема сообщения
+    public const MAX_PAYLOAD_LENGTH = 4096;
 
     /**
      * Send the given notification.
@@ -27,12 +26,6 @@ class RuStoreChannel
      */
     public function send($notifiable, Notification $notification): void
     {
-        //$response = [a call to the api of your notification send]
-        //
-        // if ($response->error) { // replace this by the code need to check for errors
-        //     throw CouldNotSendNotification::serviceRespondedWithAnError($response);
-        // }
-
         $tokens = Arr::wrap($notifiable->routeNotificationFor('ruStore', $notification));
 
         if (empty($tokens)) {
@@ -42,16 +35,36 @@ class RuStoreChannel
         /** @var RuStoreMessage $message */
         $message = $notification->toRuStore($notifiable);
 
-        $response = Collection::make($tokens)->map(function ($token) use ($message) {
+        Collection::make($tokens)->map(function ($token) use ($message) {
+            if (!$this->isNonSpaceString($token)) {
+                throw CouldNotSendNotification::ruStorePushTokenNotProvided();
+            }
+
             $message->token($token);
             $payload = json_encode(['message' => $message->toArray()], JSON_THROW_ON_ERROR);
             $url = sprintf(config('ru-store.url'), config('ru-store.project_id'));
 
-            $pending_request = Http::withToken(config('ru-store.token'))
-                ->withBody($payload)
-                ->send('POST', $url);
+            try {
+                $request = Http::withToken(config('ru-store.token'))->withBody($payload);
+                $response = $request->send('POST', $url);
+                $response->throw();
 
-            // dump($pending_request);
+            } catch (ClientException $exception) {
+                throw CouldNotSendNotification::respondedWithAnError($exception);
+            } catch (Throwable $exception) {
+                throw CouldNotSendNotification::couldNotCommunicate($exception);
+            }
         });
+    }
+
+    /**
+     * Проверка на непустую строку: аргумент $string должен быть не пустой строкой, содержащей непробельные символы
+     *
+     * @param string|null $string
+     * @return bool
+     */
+    private function isNonSpaceString(mixed $string): bool
+    {
+        return is_string($string) && !(preg_match('~\S+~m', $string) !== 1);
     }
 }

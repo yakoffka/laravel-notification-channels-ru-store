@@ -6,7 +6,6 @@ namespace NotificationChannels\RuStore\Test\Feature;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Facades\Notification;
 use NotificationChannels\RuStore\RuStoreChannel;
-use NotificationChannels\RuStore\RuStoreServiceProvider;
 use NotificationChannels\RuStore\Test\Notifications\TestNotification;
 use NotificationChannels\RuStore\Test\TestCase;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,28 +16,11 @@ use PHPUnit\Framework\Attributes\TestDox;
  */
 class ExampleTest extends TestCase
 {
-    /**
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-        Notification::fake();
-    }
-
-    /**
-     * @param $app
-     * @return \class-string[]
-     */
-    protected function getPackageProviders($app)
-    {
-        return [RuStoreServiceProvider::class];
-    }
-
     #[Test]
     #[TestDox('Пример теста')]
     public function example_feature_test(): void
     {
+        Notification::fake();
         $notification = new TestNotification();
         $notifiable = new AnonymousNotifiable();
 

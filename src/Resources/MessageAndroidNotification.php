@@ -21,14 +21,14 @@ class MessageAndroidNotification extends RuStoreResource
      *      1 - click_action будет использоваться как deep link
      */
     public function __construct(
-        public ?string $title,
-        public ?string $body,
-        public ?string $icon,
-        public ?string $color,
-        public ?string $image,
-        public ?string $channel_id,
-        public ?string $click_action,
-        public ?int    $click_action_type,
+        public ?string $title = null,
+        public ?string $body = null,
+        public ?string $icon = null,
+        public ?string $color = null,
+        public ?string $image = null,
+        public ?string $channel_id = null,
+        public ?string $click_action = null,
+        public ?int    $click_action_type = null,
     )
     {
     }
@@ -142,16 +142,6 @@ class MessageAndroidNotification extends RuStoreResource
      */
     public function toArray(): array
     {
-        // return array_filter([
-        //     'title' => $this->title,
-        //     'body' => $this->body,
-        //     'icon' => $this->icon,
-        //     'color' => $this->color,
-        //     'image' => $this->image,
-        //     'channel_id' => $this->channel_id,
-        //     'click_action' => $this->click_action,
-        //     'click_action_type' => $this->click_action_type,
-        // ]);
         return array_filter(get_object_vars($this));
     }
 }

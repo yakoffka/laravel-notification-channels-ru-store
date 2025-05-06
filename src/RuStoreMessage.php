@@ -60,12 +60,6 @@ class RuStoreMessage
      */
     public function toArray(): array
     {
-        // return array_filter([
-        //     'token' => $this->token,
-        //     'data' => $this->data,
-        //     'notification' => $this->notification,
-        //     'android' => $this->android,
-        // ]);
         return array_filter(get_object_vars($this));
     }
 }

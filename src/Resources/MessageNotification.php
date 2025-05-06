@@ -66,11 +66,6 @@ class MessageNotification extends RuStoreResource
      */
     public function toArray(): array
     {
-        // return array_filter([
-        //     'title' => $this->title,
-        //     'body' => $this->body,
-        //     'image' => $this->image,
-        // ]);
         return array_filter(get_object_vars($this));
     }
 }
