@@ -1,7 +1,7 @@
 {
-    "name": "laravel-notification-channels/ru-store",
+    "name": "yakoffka/laravel-notification-channels-ru-store",
     "description": "RuStore push notifications channel for Laravel",
-    "homepage": "https://github.com/laravel-notification-channels/ru-store",
+    "homepage": "https://github.com/yakoffka/laravel-notification-channels-ru-store",
     "license": "MIT",
     "authors": [
         {
@@ -37,5 +37,6 @@
     },
     "config": {
         "sort-packages": true
-    }
+    },
+    "minimum-stability": "stable"
 }
