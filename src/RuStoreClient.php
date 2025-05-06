@@ -15,7 +15,9 @@ class RuStoreClient
 {
     // @todo задействовать проверку максимального объема сообщения
     public const MAX_PAYLOAD_LENGTH = 4096;
-    private string $url;
+
+    private readonly string $url;
+    private readonly string $bearer_token;
 
     public function __construct()
     {
@@ -23,6 +25,8 @@ class RuStoreClient
             'https://vkpns.rustore.ru/v1/projects/%s/messages:send',
             config('ru-store.project_id')
         );
+
+        $this->bearer_token = config('ru-store.token');
     }
 
     /**
@@ -43,7 +47,7 @@ class RuStoreClient
         $payload = json_encode(['message' => $message->toArray()], JSON_THROW_ON_ERROR);
 
         try {
-            $request = Http::withToken(config('ru-store.token'))->withBody($payload);
+            $request = Http::withToken($this->bearer_token)->withBody($payload);
             $response = $request->send('POST', $this->url);
             $response->throw();
 
