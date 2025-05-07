@@ -86,4 +86,14 @@ final class RuStoreReport
 
         return $failure;
     }
+
+    /**
+     * Получение отправляемого сообщения
+     *
+     * @return RuStoreMessage
+     */
+    public function getMessage(): RuStoreMessage
+    {
+        return $this->message;
+    }
 }

@@ -48,11 +48,11 @@ Optionally include a few steps how users can set up the service.
 
 ## Usage
 
-В классе User необходимо реализовать метод, возвращающий массив токенов уведомляемого пользователя:
+В классе, использующим трейт Notifiable (например User), необходимо реализовать метод, возвращающий массив токенов уведомляемого пользователя:
 
 ```php
     /**
-     * Получение массива ru-store пуш-токенов.
+     * Получение массива ru-store пуш-токенов, полученных пользователем.
      * Используется пакетом laravel-notification-channels/rustore
      *
      * @return array
@@ -63,10 +63,160 @@ Optionally include a few steps how users can set up the service.
     }
 ```
 
+Затем создать класс уведомления, в методе via() которого указать канал отправки RuStoreChannel и добавить метод toRuStore():
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Notifications\Development;
+
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Notification;
+use NotificationChannels\RuStore\Resources\MessageAndroid;
+use NotificationChannels\RuStore\Resources\MessageAndroidNotification;
+use NotificationChannels\RuStore\Resources\MessageNotification;
+use NotificationChannels\RuStore\RuStoreChannel;
+use NotificationChannels\RuStore\RuStoreMessage;
+
+/**
+ * Уведомление пользователя, отправляемое через консоль для проверки работы канала RuStore
+ */
+class RuStoreTestNotification extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    /**
+     * Create a new notification instance.
+     *
+     * @return void
+     */
+    public function __construct(public readonly string $title, public readonly string $body)
+    {
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @param User $notifiable
+     * @return array
+     */
+    public function via(User $notifiable): array
+    {
+        return [
+            RuStoreChannel::class, // указать канал отправки RuStoreChannel
+        ];
+    }
+
+    /**
+     * Формирование сообщения, отправляемого через RuStoreChannel
+     *
+     * @param User $notifiable
+     * @return RuStoreMessage
+     */
+    public function toRuStore(User $notifiable): RuStoreMessage
+    {
+        return (new RuStoreMessage(
+            notification: new MessageNotification(
+                title: 'Test Push by RuStore',
+                body: 'Hello! Test body from RuStoreTestingNotification',
+            ),
+            android: new MessageAndroid(
+                notification: new MessageAndroidNotification(
+                    title: 'Android test Push by RuStore',
+                    body: 'Hello! Android test body from RuStoreTestingNotification',
+                )
+            )
+        ));
+    }
+}
+
+```
+
+
+#### Проверка отправки уведомлений
+Для контроля отправляемых уведомлений можно воспользоваться событиями, поджигаемыми после отправки.
+
+Событие NotificationFailed содержит отчет в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
+
+```php
+    // class FailedSendingListener
+
+    public function handle(NotificationFailed $event): void
+    {
+        match ($event->channel) {
+            RuStoreChannel::class => $this->handleRuStoreFailed($event),
+            default => null
+        };
+    }
+
+    /**
+     * Обработка неудачных отправок уведомлений через канал RuStore
+     *
+     * @param NotificationFailed $event
+     * @return void
+     */
+    private function handleRuStoreFailed(NotificationFailed $event): void
+    {
+        /** @var RuStoreReport $report */
+        $report = Arr::get($event->data, 'report');
+
+        $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {
+            $e = $singleReport->error();
+            Log::channel('notifications')->error('RuStoreFailed Ошибка отправки уведомления', [
+                'user' => $event->notifiable->short_info,
+                'token' => $token,
+                'message' => $report->getMessage()->toArray(),
+                'error' => ($e->getCode() . ' ' . $e->getMessage()),
+            ]);
+        });
+    }
+
+```
+
+Событие NotificationFailed содержит отчет в свойстве response: ```$report = $event->response;```
+
+```php
+    // class SentListener
+
+    /**
+     * Обработка успешно отправленных сообщений
+     */
+    public function handle(NotificationSent $event): void
+    {
+        match ($event->channel) {
+            RuStoreChannel::class => $this->handleRuStoreSuccess($event),
+            default => null
+        };
+    }
+
+    /**
+     * Логирование успешно отправленных ru-store-уведомлений
+     */
+    public function handleRuStoreSuccess(NotificationSent $event): void
+    {
+        /** @var RuStoreReport $report */
+        $report = $event->response;
+
+        $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {
+            /** @var Response $response */
+            $response = $singleReport->response();
+            Log::channel('notifications')->info('RuStoreSuccess Уведомление успешно отправлено', [
+                'user' => $event->notifiable->short_info,
+                'token' => $token,
+                'message' => $report->getMessage()->toArray(),
+                'response_status' => $response->status(),
+            ]);
+        });
+    }
+
+```
+
 
 ### Available Message methods
 
-A list of all available options
+Сообщение поддерживает все свойства, описанные в [документации](https://www.rustore.ru/help/sdk/push-notifications/send-push-notifications)
 
 ## Changelog
 
