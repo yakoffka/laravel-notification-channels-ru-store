@@ -3,12 +3,9 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
 
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Promise\PromiseInterface;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
-use JsonException;
-use NotificationChannels\RuStore\Exceptions\CouldNotSendNotification;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
+use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 use Throwable;
 
 class RuStoreClient
@@ -16,58 +13,55 @@ class RuStoreClient
     // @todo задействовать проверку максимального объема сообщения
     public const MAX_PAYLOAD_LENGTH = 4096;
 
+    private const URL_FORMAT = 'https://vkpns.rustore.ru/v1/projects/%s/messages:send';
     private readonly string $url;
     private readonly string $bearer_token;
 
     public function __construct()
     {
-        $this->url = sprintf(
-            'https://vkpns.rustore.ru/v1/projects/%s/messages:send',
-            config('ru-store.project_id')
-        );
-
+        $this->url = sprintf(self::URL_FORMAT, config('ru-store.project_id'));
         $this->bearer_token = config('ru-store.token');
     }
 
     /**
-     * @param string $token
+     * Отправка уведомлений на все устройства пользователя
+     *
      * @param RuStoreMessage $message
-     * @return PromiseInterface|Response
-     * @throws CouldNotSendNotification
-     * @throws JsonException
+     * @param array $tokens
+     * @return RuStoreReport
      */
-    public function send(string $token, RuStoreMessage $message): PromiseInterface|Response
+    public function send(RuStoreMessage $message, array $tokens): RuStoreReport
     {
-        // @todo убрать проверку и протестировать
-        if (!$this->isNonSpaceString($token)) {
-            throw CouldNotSendNotification::ruStorePushTokenNotProvided();
-        }
+        $report = RuStoreReport::init($tokens, $message);
+        // $reports->all()->map(fn(?RuStoreSingleReport $report, string $token) => $reports->addReport($token, $this->send($message, $token)));
+        $report->all()->each(function(?RuStoreSingleReport $_, string $token) use ($report, $message) {
+            // $reports->addReport($token, $this->send($message, $token));
+            $single_report = $this->sendSingle($message, $token);
+            // dd($single_report);
+            $report->addReport($token, $single_report);
+        });
 
-        $message->token($token);
-        $payload = json_encode(['message' => $message->toArray()], JSON_THROW_ON_ERROR);
-
-        try {
-            $request = Http::withToken($this->bearer_token)->withBody($payload);
-            $response = $request->send('POST', $this->url);
-            $response->throw();
-
-        } catch (ClientException $exception) {
-            throw CouldNotSendNotification::respondedWithAnError($exception);
-        } catch (Throwable $exception) {
-            throw CouldNotSendNotification::couldNotCommunicate($exception);
-        }
-
-        return $response;
+        return $report;
     }
 
     /**
-     * Проверка на непустую строку: аргумент $string должен быть не пустой строкой, содержащей непробельные символы
+     * Отправка уведомления на конкретное устройство пользователя
      *
-     * @param string|null $string
-     * @return bool
+     * @param RuStoreMessage $message
+     * @param string $token
+     * @return RuStoreSingleReport
      */
-    private function isNonSpaceString(mixed $string): bool
+    public function sendSingle(RuStoreMessage $message, string $token): RuStoreSingleReport
     {
-        return is_string($string) && !(preg_match('~\S+~m', $string) !== 1);
+        try {
+            $request = Http::withToken($this->bearer_token)->withBody($message->getPayload($token));
+            $response = $request->send('POST', $this->url);
+            $response->throw();
+
+        } catch (Throwable $exception) {
+            return RuStoreSingleReport::failure($exception);
+        }
+
+        return RuStoreSingleReport::success($response);
     }
 }
