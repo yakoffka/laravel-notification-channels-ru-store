@@ -3,18 +3,21 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
 
-use GuzzleHttp\Exception\ClientException;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Http;
-use NotificationChannels\RuStore\Exceptions\CouldNotSendNotification;
 use Illuminate\Notifications\Notification;
-use Throwable;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 
 class RuStoreChannel
 {
-    // @todo задействовать проверку максимального объема сообщения
-    public const MAX_PAYLOAD_LENGTH = 4096;
+    /**
+     * @param Dispatcher $events
+     * @param RuStoreClient $client
+     */
+    public function __construct(protected Dispatcher $events, private readonly RuStoreClient $client)
+    {
+    }
 
     /**
      * Send the given notification.
@@ -22,49 +25,32 @@ class RuStoreChannel
      * @param mixed $notifiable
      * @param Notification $notification
      *
-     * @return void
+     * @return RuStoreReport
      */
-    public function send($notifiable, Notification $notification): void
+    public function send(mixed $notifiable, Notification $notification): RuStoreReport
     {
-        $tokens = Arr::wrap($notifiable->routeNotificationFor('ruStore', $notification));
-
-        if (empty($tokens)) {
-            return;
-        }
-
-        /** @var RuStoreMessage $message */
         $message = $notification->toRuStore($notifiable);
+        $tokens = Arr::wrap($notifiable->routeNotificationForRuStore());
+        $report = $this->client->send($message, $tokens);
+        $this->dispatchFailedNotification($notifiable, $notification, $report->getFailure());
 
-        Collection::make($tokens)->map(function ($token) use ($message) {
-            if (!$this->isNonSpaceString($token)) {
-                throw CouldNotSendNotification::ruStorePushTokenNotProvided();
-            }
-
-            $message->token($token);
-            $payload = json_encode(['message' => $message->toArray()], JSON_THROW_ON_ERROR);
-            $url = sprintf(config('ru-store.url'), config('ru-store.project_id'));
-
-            try {
-                $request = Http::withToken(config('ru-store.token'))->withBody($payload);
-                $response = $request->send('POST', $url);
-                $response->throw();
-
-            } catch (ClientException $exception) {
-                throw CouldNotSendNotification::respondedWithAnError($exception);
-            } catch (Throwable $exception) {
-                throw CouldNotSendNotification::couldNotCommunicate($exception);
-            }
-        });
+        return $report->getSuccess();
     }
 
     /**
-     * Проверка на непустую строку: аргумент $string должен быть не пустой строкой, содержащей непробельные символы
+     * Поджигание события NotificationFailed
      *
-     * @param string|null $string
-     * @return bool
+     * @param mixed $notifiable
+     * @param Notification $notification
+     * @param RuStoreReport $report
+     * @return void
      */
-    private function isNonSpaceString(mixed $string): bool
+    private function dispatchFailedNotification(mixed $notifiable, Notification $notification, RuStoreReport $report): void
     {
-        return is_string($string) && !(preg_match('~\S+~m', $string) !== 1);
+        if ($report->all()->isNotEmpty()) {
+            $this->events->dispatch(new NotificationFailed($notifiable, $notification, self::class, [
+                'report' => $report,
+            ]));
+        }
     }
 }
