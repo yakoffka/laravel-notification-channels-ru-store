@@ -9,23 +9,22 @@ class RuStoreServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
+     *
+     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->publishes([
             __DIR__ . '/../config/ru-store.php' => config_path('ru-store.php'),
         ]);
-
     }
 
     /**
      * Register the application services.
+     *
+     * @return void
      */
-    public function register()
+    public function register(): void
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/ru-store.php',
-            'ru-store' // Ключ конфигурации: config('ru-store')
-        );
     }
 }
