@@ -37,10 +37,16 @@ This package makes it easy to send notifications using [RuStore](link to service
 
 
 ## Installation
-
+Установите пакет с помощью команды:
 ```bash
   composer require yakoffka/laravel-notification-channels-ru-store
 ```
+
+Затем опубликуйте конфигурационный файл:
+```bash
+  php artisan vendor:publish --provider="NotificationChannels\RuStore\RuStoreServiceProvider"
+```
+и обновите ваш .env, указав там значения, полученные в [RuStore консоли](https://console.rustore.ru/waiting)
 
 ### Setting up the RuStore service
 
@@ -136,47 +142,13 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
 
 
 #### Проверка отправки уведомлений
-Для контроля отправляемых уведомлений можно воспользоваться событиями, поджигаемыми после отправки.
+Для контроля отправляемых уведомлений можно воспользоваться событиями, поджигаемыми после отправки:
+- cобытие NotificationSent содержит отчет RuStoreReport в свойстве response: ```$report = $event->response;```
+- cобытие NotificationFailed содержит отчет RuStoreReport в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
 
-Событие NotificationFailed содержит отчет в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
+Метод RuStoreReport::all() вернет коллекцию отчетов RuStoreSingleReport об отправке уведомлений на конкретное устройство с push-токенами в качестве ключей
 
-```php
-    // class FailedSendingListener
-
-    public function handle(NotificationFailed $event): void
-    {
-        match ($event->channel) {
-            RuStoreChannel::class => $this->handleRuStoreFailed($event),
-            default => null
-        };
-    }
-
-    /**
-     * Обработка неудачных отправок уведомлений через канал RuStore
-     *
-     * @param NotificationFailed $event
-     * @return void
-     */
-    private function handleRuStoreFailed(NotificationFailed $event): void
-    {
-        /** @var RuStoreReport $report */
-        $report = Arr::get($event->data, 'report');
-
-        $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {
-            $e = $singleReport->error();
-            Log::channel('notifications')->error('RuStoreFailed Ошибка отправки уведомления', [
-                'user' => $event->notifiable->short_info,
-                'token' => $token,
-                'message' => $report->getMessage()->toArray(),
-                'error' => ($e->getCode() . ' ' . $e->getMessage()),
-            ]);
-        });
-    }
-
-```
-
-Событие NotificationFailed содержит отчет в свойстве response: ```$report = $event->response;```
-
+Пример использования события NotificationSent:
 ```php
     // class SentListener
 
@@ -213,6 +185,45 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
 
 ```
 
+Пример использования события NotificationFailed:
+```php
+    // class FailedSendingListener
+
+    public function handle(NotificationFailed $event): void
+    {
+        match ($event->channel) {
+            RuStoreChannel::class => $this->handleRuStoreFailed($event),
+            default => null
+        };
+    }
+
+    /**
+     * Обработка неудачных отправок уведомлений через канал RuStore
+     *
+     * @param NotificationFailed $event
+     * @return void
+     */
+    private function handleRuStoreFailed(NotificationFailed $event): void
+    {
+        /** @var RuStoreReport $report */
+        $report = Arr::get($event->data, 'report');
+
+        $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {
+            $e = $singleReport->error();
+            Log::channel('notifications')->error('RuStoreFailed Ошибка отправки уведомления', [
+                'user' => $event->notifiable->short_info,
+                'token' => $token,
+                'message' => $report->getMessage()->toArray(),
+                'error' => ($e->getCode() . ' ' . $e->getMessage()),
+            ]);
+        });
+    }
+
+```
+
+NOTE: Событие NotificationSent поджигается при каждой отправке уведомления вне зависимости от наличия успешно отправленных сообщений. В случае, если сообщение не было успешно отправлено ни на одно устройство, метод ```$report->all()``` вернет пустую коллекцию. 
+
+NOTE: Событие NotificationFailed поджигается только в случае наличия хотя-бы одной неуспешной отправки, поэтому, метод ```$report->all()``` всегда будет возвращать не пустую коллекцию. 
 
 ### Available Message methods
 
