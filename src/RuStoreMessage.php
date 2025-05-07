@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
 
+use JsonException;
 use NotificationChannels\RuStore\Resources\MessageAndroid;
 use NotificationChannels\RuStore\Resources\MessageNotification;
 
@@ -14,30 +15,16 @@ class RuStoreMessage
     /**
      * Create a new message instance.
      *
-     * @param string|null $token Push-токен пользователя, полученный в приложении.
-     * @param string|null $data Объект, содержащий пары "key": value.
+     * @param array|null $data Объект, содержащий пары "key": value.
      * @param MessageNotification|null $notification Базовый шаблон уведомления для использования на всех платформах.
      * @param MessageAndroid|null $android Специальные параметры Android для сообщений.
      */
     public function __construct(
-        public ?string $token = null,
-        public ?string $data = null,
+        public ?array              $data = null,
         public ?MessageNotification $notification = null,
-        public ?MessageAndroid $android = null,
-    ) {
-    }
-
-    /**
-     * Set the message token.
-     *
-     * @param string|null $token
-     * @return $this
-     */
-    public function token(?string $token): self
+        public ?MessageAndroid      $android = null,
+    )
     {
-        $this->token = $token;
-
-        return $this;
     }
 
     /**
@@ -46,11 +33,22 @@ class RuStoreMessage
      * @param array|null $data
      * @return $this
      */
-    public function data(?array $data): self
+    public function setData(?array $data): self
     {
         $this->data = $data;
 
         return $this;
+    }
+
+    /**
+     * @param string $token
+     * @return string
+     * @throws JsonException
+     */
+    public function getPayload(string $token): string
+    {
+        return json_encode(['message' => compact('token') + $this->toArray()], JSON_THROW_ON_ERROR);
+
     }
 
     /**

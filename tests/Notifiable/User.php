@@ -14,8 +14,20 @@ class User extends Authenticatable
 
     // protected $fillable = ['email'];
 
-    public function routeNotificationForRuStore()
+    private ?array $tokens = null;
+
+    public function setTokens(array $tokens): self
     {
-        return [env('RUSTORE_EXAMPLE_PUSH_TOKEN', 'none')];
+        $this->tokens = $tokens;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function routeNotificationForRuStore(): array
+    {
+        return $this->tokens ?? [env('RUSTORE_EXAMPLE_PUSH_TOKEN', 'none')];
     }
 }
