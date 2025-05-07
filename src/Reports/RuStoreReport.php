@@ -75,7 +75,7 @@ final class RuStoreReport
     }
 
     /**
-     * Получение отчета об успешных отправках
+     * Получение отчета об ошибочных отправках
      *
      * @return RuStoreReport
      */

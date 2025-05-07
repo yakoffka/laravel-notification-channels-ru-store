@@ -12,13 +12,13 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 
 /**
- * ExampleTest - пример тестового класса
+ * NotificationTest - проверка отправки уведомлений
  */
-class ExampleTest extends TestCase
+class NotificationTest extends TestCase
 {
     #[Test]
-    #[TestDox('Пример теста')]
-    public function example_feature_test(): void
+    #[TestDox('Простая проверка отправки уведомления через канал RuStoreChannel')]
+    public function notificationSimple(): void
     {
         Notification::fake();
         $notification = new TestNotification();
