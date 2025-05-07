@@ -18,6 +18,9 @@ abstract class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->app['config']->set('ru-store.project_id', env('RUSTORE_PROJECT_ID', 'test'));
+        $this->app['config']->set('ru-store.token', env('RUSTORE_TOKEN', 'test'));
     }
 
     /**
