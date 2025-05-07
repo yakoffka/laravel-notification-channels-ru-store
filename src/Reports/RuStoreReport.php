@@ -13,7 +13,7 @@ final class RuStoreReport
 {
     /**
      * @param Collection $reports Коллекция отчетов об отправке уведомлений с push-токенами в качестве ключей
-     * @param RuStoreMessage $message
+     * @param RuStoreMessage $message Отправляемое сообщение
      */
     public function __construct(
         private Collection              $reports,
@@ -48,7 +48,7 @@ final class RuStoreReport
     }
 
     /**
-     * Добавление отчета об отправке уведомления адресату
+     * Добавление отчета об отправке уведомления адресату $token
      *
      * @param string $token
      * @param RuStoreSingleReport $report
@@ -59,16 +59,6 @@ final class RuStoreReport
         $this->reports->put($token, $report);
 
         return $this;
-    }
-
-    /**
-     * Получение параметров отправляемого сообщения
-     *
-     * @return array
-     */
-    public function getMessage(): array
-    {
-        return $this->message->toArray();
     }
 
     /**

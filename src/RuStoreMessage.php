@@ -15,45 +15,16 @@ class RuStoreMessage
     /**
      * Create a new message instance.
      *
-     * @ param string|null $currentToken Push-токен пользователя, полученный в приложении.
-     * @param string|null $data Объект, содержащий пары "key": value.
+     * @param array|null $data Объект, содержащий пары "key": value.
      * @param MessageNotification|null $notification Базовый шаблон уведомления для использования на всех платформах.
      * @param MessageAndroid|null $android Специальные параметры Android для сообщений.
      */
     public function __construct(
-        //public ?string              $currentToken = null,
-        public ?string              $data = null,
+        public ?array              $data = null,
         public ?MessageNotification $notification = null,
         public ?MessageAndroid      $android = null,
     )
     {
-    }
-
-//    /**
-//     * Set all tokens notifiable.
-//     *
-//     * @param array $tokens
-//     * @return $this
-//     */
-//    public function setTokens(array $tokens): self
-//    {
-//        $this->reports = array_combine($tokens, array_fill(0, count($tokens), null));
-//        dd($this->reports);
-//
-//        return $this;
-//    }
-
-    /**
-     * Set the message token.
-     *
-     * @param string|null $token
-     * @return $this
-     */
-    public function setCurrentToken(?string $token): self
-    {
-        $this->currentToken = $token;
-
-        return $this;
     }
 
     /**

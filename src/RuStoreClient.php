@@ -33,12 +33,8 @@ class RuStoreClient
     public function send(RuStoreMessage $message, array $tokens): RuStoreReport
     {
         $report = RuStoreReport::init($tokens, $message);
-        // $reports->all()->map(fn(?RuStoreSingleReport $report, string $token) => $reports->addReport($token, $this->send($message, $token)));
         $report->all()->each(function(?RuStoreSingleReport $_, string $token) use ($report, $message) {
-            // $reports->addReport($token, $this->send($message, $token));
-            $single_report = $this->sendSingle($message, $token);
-            // dd($single_report);
-            $report->addReport($token, $single_report);
+            $report->addReport($token, $this->sendSingle($message, $token));
         });
 
         return $report;
