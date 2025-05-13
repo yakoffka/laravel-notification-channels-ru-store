@@ -7,11 +7,17 @@
 
 ### Added
 - Добавлен отчет об отправке уведомлений в поджигаемых событиях
+- Added report on sending notifications in ignited events
 
 ### Changed
-- Дополнено описание [Readme](README.md)
+- Изменена обработка ответов от сервера: все неуспешные ответы (не 2**) интерпретируются как ошибка отправки (включая 1** и 3**)
+- Changed handling of server responses: all unsuccessful responses (not 2**) are interpreted as a sending error (including 1** and 3**)
+- Дополнено описание пакета [Readme](README.md)
+- The package description has been supplemented [Readme](README.md)
 
-[//]: # (### Fixed)
+### Fixed
+- Исправлено поджигание события NotificationSent при отсутствии успешно отправленных сообщений
+- Fixed firing of NotificationSent event when there were no successfully sent messages
 
 [//]: # (### Deleted)
 

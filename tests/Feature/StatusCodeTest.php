@@ -14,6 +14,7 @@ use NotificationChannels\RuStore\Test\Notifications\TestNotification;
 use NotificationChannels\RuStore\Test\TestCase;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
+use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
 
 /**
  * StatusCodeTest - проверка обработки некоторых статусов ответа с помощью Http::fake()
@@ -51,10 +52,14 @@ class StatusCodeTest extends TestCase
         $notification = new TestNotification();
         $notifiable = new User();
 
-        $notifiable->notify($notification);
+        try {
+            $notifiable->notify($notification);
+        } catch (RuStorePushNotingSentException $e) {
+        }
 
+        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertDispatched(NotificationSent::class);
+        Event::assertNotDispatched(NotificationSent::class);
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();
@@ -78,10 +83,14 @@ class StatusCodeTest extends TestCase
         $notification = new TestNotification();
         $notifiable = new User();
 
-        $notifiable->notify($notification);
+        try {
+            $notifiable->notify($notification);
+        } catch (RuStorePushNotingSentException $e) {
+        }
 
+        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertDispatched(NotificationSent::class);
+        Event::assertNotDispatched(NotificationSent::class);
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();
@@ -108,10 +117,14 @@ class StatusCodeTest extends TestCase
         $notification = new TestNotification();
         $notifiable = new User();
 
-        $notifiable->notify($notification);
+        try {
+            $notifiable->notify($notification);
+        } catch (RuStorePushNotingSentException $e) {
+        }
 
+        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertDispatched(NotificationSent::class);
+        Event::assertNotDispatched(NotificationSent::class);
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();
@@ -137,10 +150,14 @@ class StatusCodeTest extends TestCase
         $notification = new TestNotification();
         $notifiable = new User();
 
-        $notifiable->notify($notification);
+        try {
+            $notifiable->notify($notification);
+        } catch (RuStorePushNotingSentException $e) {
+        }
 
+        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertDispatched(NotificationSent::class);
+        Event::assertNotDispatched(NotificationSent::class);
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();
@@ -164,10 +181,14 @@ class StatusCodeTest extends TestCase
         $notification = new TestNotification();
         $notifiable = new User();
 
-        $notifiable->notify($notification);
+        try {
+            $notifiable->notify($notification);
+        } catch (RuStorePushNotingSentException $e) {
+        }
 
+        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertDispatched(NotificationSent::class);
+        Event::assertNotDispatched(NotificationSent::class);
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();

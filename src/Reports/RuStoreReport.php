@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace NotificationChannels\RuStore\Reports;
 
 use Illuminate\Support\Collection;
+use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
 use NotificationChannels\RuStore\RuStoreMessage;
 
 /**
@@ -65,11 +66,16 @@ final class RuStoreReport
      * Получение отчета об успешных отправках
      *
      * @return RuStoreReport
+     * @throws RuStorePushNotingSentException
      */
     public function getSuccess(): self
     {
         $success = clone $this;
         $success->reports = $this->reports->filter(fn (RuStoreSingleReport $report) => $report->isSuccess());
+
+        if($success->reports->count() === 0) {
+            throw new RuStorePushNotingSentException();
+        }
 
         return $success;
     }
