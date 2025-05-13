@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Feature;
+namespace NotificationChannels\RuStore\Test\Feature;
 
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
+use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
 use NotificationChannels\RuStore\Test\Notifiable\User;
 use NotificationChannels\RuStore\Test\Notifications\TestNotification;
 use NotificationChannels\RuStore\Test\TestCase;
@@ -51,12 +52,11 @@ class EventsFireTest extends TestCase
             ]
         ], 404);
 
-        $notifiable->notify($notification);
+        try {
+            $notifiable->notify($notification);
+        } catch (RuStorePushNotingSentException $e) {
+        }
 
-        Event::assertDispatched(static function (NotificationSent $event) {
-            $tokens = $event->response->all()->keys()->toArray();
-            return $tokens === [];
-        });
         Event::assertDispatched(static function (NotificationFailed $event) {
             $tokens = $event->data['report']->all()->keys()->toArray();
             return $tokens === ['invalid'];

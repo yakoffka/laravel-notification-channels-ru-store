@@ -3,7 +3,10 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
 
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use NotificationChannels\RuStore\Exceptions\RuStorePushException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
 use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 use Throwable;
@@ -33,7 +36,7 @@ class RuStoreClient
     public function send(RuStoreMessage $message, array $tokens): RuStoreReport
     {
         $report = RuStoreReport::init($tokens, $message);
-        $report->all()->each(function(?RuStoreSingleReport $_, string $token) use ($report, $message) {
+        $report->all()->each(function (?RuStoreSingleReport $_, string $token) use ($report, $message) {
             $report->addReport($token, $this->sendSingle($message, $token));
         });
 
@@ -51,13 +54,15 @@ class RuStoreClient
     {
         try {
             $request = Http::withToken($this->bearer_token)->withBody($message->getPayload($token));
+            /** @var PromiseInterface|Response $response */
             $response = $request->send('POST', $this->url);
-            $response->throw();
 
         } catch (Throwable $exception) {
             return RuStoreSingleReport::failure($exception);
         }
 
-        return RuStoreSingleReport::success($response);
+        return $response->successful()
+            ? RuStoreSingleReport::success($response)
+            : RuStoreSingleReport::failure(RuStorePushException::fromResponse($response), $response);
     }
 }
