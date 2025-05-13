@@ -214,7 +214,8 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
                 'user' => $event->notifiable->short_info,
                 'token' => $token,
                 'message' => $report->getMessage()->toArray(),
-                'error' => ($e->getCode() . ' ' . $e->getMessage()),
+                'error_code' => $e->getCode(),
+                'error_message' => $e->getMessage(),
             ]);
         });
     }

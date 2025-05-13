@@ -37,6 +37,33 @@ class StatusCodeTest extends TestCase
     }
 
     #[Test]
+    #[TestDox('Проверка обработки ошибочного ответа 301 Moved Permanently')]
+    public function handle_error_response301(): void
+    {
+        Event::fake();
+        Http::fake([
+            $this->url => Http::response([
+                'code' => 301,
+                'message' => 'Moved Permanently',
+                'status' => '',
+            ], 301),
+        ]);
+        $notification = new TestNotification();
+        $notifiable = new User();
+
+        $notifiable->notify($notification);
+
+        Event::assertDispatched(NotificationSending::class);
+        Event::assertDispatched(NotificationSent::class);
+        Event::assertDispatched(static function (NotificationFailed $event) {
+            /** @var RequestException $e */
+            $e = $event->data['report']->all()->sole()->error();
+            return $e->getCode() === 301
+                && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
+        });
+    }
+
+    #[Test]
     #[TestDox('Проверка обработки ошибочного ответа 401 Forbidden')]
     public function handle_error_response401(): void
     {
@@ -58,8 +85,9 @@ class StatusCodeTest extends TestCase
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();
-            return $e->getCode() === 401 && $e->getMessage() === "HTTP request returned status code 401:\n"
-                . "{\"code\":401,\"message\":\"unauthorized: Invalid Authorization header\",\"status\":\"UNAUTHORIZED\"}\n";
+            return $e->getCode() === 401
+                && $e->getMessage() === 'RuStoreClientError: '
+                . '{"code":401,"message":"unauthorized: Invalid Authorization header","status":"UNAUTHORIZED"}';
         });
     }
 
@@ -87,8 +115,8 @@ class StatusCodeTest extends TestCase
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();
-            return $e->getCode() === 403 && $e->getMessage() === "HTTP request returned status code 403:\n"
-                . "{\"error\":{\"code\":403,\"message\":\"SenderId mismatch\",\"status\":\"PERMISSION_DENIED\"}}\n";
+            return $e->getCode() === 403 && $e->getMessage() === 'RuStoreClientError: '
+                . '{"error":{"code":403,"message":"SenderId mismatch","status":"PERMISSION_DENIED"}}';
         });
     }
 
@@ -116,8 +144,35 @@ class StatusCodeTest extends TestCase
         Event::assertDispatched(static function (NotificationFailed $event) {
             /** @var RequestException $e */
             $e = $event->data['report']->all()->sole()->error();
-            return $e->getCode() === 404 && $e->getMessage() === "HTTP request returned status code 404:\n"
-                . "{\"error\":{\"code\":404,\"message\":\"Requested entity was not found.\",\"status\":\"NOT_FOUND\"}}\n";
+            return $e->getCode() === 404 && $e->getMessage() === 'RuStoreClientError: '
+                . '{"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}}';
+        });
+    }
+
+    #[Test]
+    #[TestDox('Проверка обработки ошибочного ответа 500 Internal Server Error')]
+    public function handle_error_response500(): void
+    {
+        Event::fake();
+        Http::fake([
+            $this->url => Http::response([
+                'code' => 500,
+                'message' => 'Internal Server Error',
+                'status' => '',
+            ], 500),
+        ]);
+        $notification = new TestNotification();
+        $notifiable = new User();
+
+        $notifiable->notify($notification);
+
+        Event::assertDispatched(NotificationSending::class);
+        Event::assertDispatched(NotificationSent::class);
+        Event::assertDispatched(static function (NotificationFailed $event) {
+            /** @var RequestException $e */
+            $e = $event->data['report']->all()->sole()->error();
+            return $e->getCode() === 500
+                && $e->getMessage() === 'RuStoreServerError: {"code":500,"message":"Internal Server Error","status":""}';
         });
     }
 }
