@@ -3,11 +3,13 @@
 [//]: # (https://keepachangelog.com/ru/0.3.0/)
 
 
-## Unreleased
+## 1.0.1 - 2025-05-07
 
 ### Added
-- Добавлен отчет об отправке уведомлений в поджигаемых событиях
-- Added report on sending notifications in ignited events
+- Добавлен отчет об отправке уведомлений RuStoreReport в поджигаемых событиях
+- Added report on sending notifications RuStoreReport in fired events
+  - NotificationSent (```$report = $event->response;```)
+  - NotificationFailed (```$report = Arr::get($event->data, 'report');```)
 
 ### Changed
 - Изменена обработка ответов от сервера: все неуспешные ответы (не 2**) интерпретируются как ошибка отправки (включая 1** и 3**)
@@ -21,11 +23,6 @@
 
 [//]: # (### Deleted)
 
-
-
-## 1.0.0 - 2025-05-06
-
-- initial release
 
 
 ## 1.0.0 - 2025-05-06

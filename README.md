@@ -25,9 +25,9 @@ This package makes it easy to send notifications using [RuStore](link to service
 ## Contents
 
 - [Installation](#installation)
-	- [Setting up the RuStore service](#setting-up-the-RuStore-service)
+- [Setting up the RuStore service](#setting-up-the-RuStore-service)
 - [Usage](#usage)
-	- [Available Message methods](#available-message-methods)
+- [Available Message methods](#available-message-methods)
 - [Changelog](#changelog)
 - [Testing](#testing)
 - [Security](#security)
@@ -184,6 +184,8 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
     }
 
 ```
+NOTE: Событие NotificationSent поджигается только в случае наличия успешно отправленных сообщений.
+
 
 Пример использования события NotificationFailed:
 ```php
@@ -221,10 +223,8 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
     }
 
 ```
+NOTE: Событие NotificationFailed поджигается только в случае наличия хотя-бы одной неуспешной отправки.
 
-NOTE: Событие NotificationSent поджигается при каждой отправке уведомления вне зависимости от наличия успешно отправленных сообщений. В случае, если сообщение не было успешно отправлено ни на одно устройство, метод ```$report->all()``` вернет пустую коллекцию. 
-
-NOTE: Событие NotificationFailed поджигается только в случае наличия хотя-бы одной неуспешной отправки, поэтому, метод ```$report->all()``` всегда будет возвращать не пустую коллекцию. 
 
 ### Available Message methods
 
