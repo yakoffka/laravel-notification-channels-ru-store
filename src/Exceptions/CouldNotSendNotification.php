@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Exceptions;
@@ -31,7 +32,7 @@ class CouldNotSendNotification extends Exception
      */
     public static function respondedWithAnError(ClientException $exception): self
     {
-        if (!$exception->hasResponse()) {
+        if ( ! $exception->hasResponse()) {
             return new self('RuStore responded with an error but no response body found');
         }
 
@@ -49,7 +50,7 @@ class CouldNotSendNotification extends Exception
     public static function couldNotCommunicate(Throwable $e): self
     {
         return new self(
-            'The communication with RuStore failed. "' . $e->getMessage() . '"'
+            'The communication with RuStore failed. "' . $e->getMessage() . '"',
         );
     }
 

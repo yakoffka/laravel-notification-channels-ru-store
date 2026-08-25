@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Resources;
@@ -29,9 +30,7 @@ class MessageAndroidNotification extends RuStoreResource
         public ?string $channel_id = null,
         public ?string $click_action = null,
         public ?int    $click_action_type = null,
-    )
-    {
-    }
+    ) {}
 
     /**
      * @param string|null $title

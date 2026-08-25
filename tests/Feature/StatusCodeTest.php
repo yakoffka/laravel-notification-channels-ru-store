@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test\Feature;
@@ -144,7 +145,7 @@ class StatusCodeTest extends TestCase
                     'code' => 403,
                     'message' => 'SenderId mismatch',
                     'status' => 'PERMISSION_DENIED',
-                ]
+                ],
             ], 403),
         ]);
         $notification = new TestNotification();
@@ -193,7 +194,7 @@ class StatusCodeTest extends TestCase
                     'code' => 404,
                     'message' => 'Requested entity was not found.',
                     'status' => 'NOT_FOUND',
-                ]
+                ],
             ], 404),
         ]);
         $notification = new TestNotification();

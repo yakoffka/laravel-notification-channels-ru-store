@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
@@ -23,9 +24,7 @@ class RuStoreMessage
         public ?array              $data = null,
         public ?MessageNotification $notification = null,
         public ?MessageAndroid      $android = null,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Set the message data.

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test\Notifications;
@@ -32,8 +33,8 @@ class TestNotification extends Notification
                 notification: new MessageAndroidNotification(
                     title: 'Android test Push by RuStore',
                     body: 'Hello! Android test body from RuStoreTestingNotification',
-                )
-            )
+                ),
+            ),
         ));
     }
 }

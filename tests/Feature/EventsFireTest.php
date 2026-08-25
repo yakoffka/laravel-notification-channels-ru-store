@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test\Feature;
@@ -49,7 +50,7 @@ class EventsFireTest extends TestCase
                 'code' => 404,
                 'message' => 'Requested entity was not found.',
                 'status' => 'NOT_FOUND',
-            ]
+            ],
         ], 404);
 
         try {
@@ -91,7 +92,7 @@ class EventsFireTest extends TestCase
                     'code' => 404,
                     'message' => 'Requested entity was not found.',
                     'status' => 'NOT_FOUND',
-                ]
+                ],
             ], 404);
 
         $notifiable->notify($notification);
@@ -120,7 +121,7 @@ class EventsFireTest extends TestCase
                     'code' => 404,
                     'message' => 'Requested entity was not found.',
                     'status' => 'NOT_FOUND',
-                ]
+                ],
             ], 404)
             ->push(null, 200)
             ->push([
@@ -128,7 +129,7 @@ class EventsFireTest extends TestCase
                     'code' => 404,
                     'message' => 'Requested entity was not found.',
                     'status' => 'NOT_FOUND',
-                ]
+                ],
             ], 404);
 
         $notifiable->notify($notification);

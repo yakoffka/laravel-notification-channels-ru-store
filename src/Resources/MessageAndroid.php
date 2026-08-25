@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Resources;
@@ -14,10 +15,8 @@ class MessageAndroid extends RuStoreResource
      */
     public function __construct(
         public ?string                     $ttl = null,
-        public ?MessageAndroidNotification $notification = null
-    )
-    {
-    }
+        public ?MessageAndroidNotification $notification = null,
+    ) {}
 
     /**
      * @param string|null $ttl
