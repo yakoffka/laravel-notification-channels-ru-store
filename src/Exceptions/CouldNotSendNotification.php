@@ -46,6 +46,9 @@ class CouldNotSendNotification extends Exception
 
     /**
      * Ошибка связи с сервером RuStore
+     *
+     * @param Throwable $e
+     * @return self
      */
     public static function couldNotCommunicate(Throwable $e): self
     {
@@ -56,12 +59,10 @@ class CouldNotSendNotification extends Exception
 
     /**
      * @param PromiseInterface|Response $response
-     * @return static
+     * @return self
      */
-    public static function serviceRespondedWithAnError(PromiseInterface|Response $response)
+    public static function serviceRespondedWithAnError(PromiseInterface|Response $response): self
     {
-        // $response->throw();
-        // dd($response);
-        return new static("Descriptive error message.");
+        return new self("Descriptive error message.");
     }
 }

@@ -58,6 +58,7 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
+        $this::assertTrue(isset($e));
         $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
         Event::assertNotDispatched(NotificationSent::class);
@@ -105,6 +106,7 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
+        $this::assertTrue(isset($e));
         $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
         Event::assertNotDispatched(NotificationSent::class);
@@ -156,6 +158,7 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
+        $this::assertTrue(isset($e));
         $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
         Event::assertNotDispatched(NotificationSent::class);
@@ -205,6 +208,7 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
+        $this::assertTrue(isset($e));
         $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
         Event::assertNotDispatched(NotificationSent::class);
@@ -252,6 +256,7 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
+        $this::assertTrue(isset($e));
         $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
         Event::assertNotDispatched(NotificationSent::class);

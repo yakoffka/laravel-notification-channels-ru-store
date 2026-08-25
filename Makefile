@@ -27,8 +27,8 @@ lint-fix:
 analyse:
 	docker compose exec php-82 composer analyse
 
-check: lint analyse test
-	@echo "All checks passed ✅"
+check: lint-fix analyse test
+	@echo "All checks passed"
 
 help:
 	@echo "Available targets:"

@@ -7,6 +7,11 @@ namespace NotificationChannels\RuStore\Resources;
 abstract class RuStoreResource
 {
     /**
+     * Правка ошибки phpstan: Unsafe usage of new static()
+     */
+    abstract public function __construct();
+
+    /**
      * Map the resource to an array.
      *
      * @return array
@@ -19,6 +24,6 @@ abstract class RuStoreResource
      */
     public static function create(...$args): static
     {
-        return new static(...$args);
+        return new static (...$args);
     }
 }
