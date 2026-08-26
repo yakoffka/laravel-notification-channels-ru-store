@@ -2,8 +2,22 @@
 
 [//]: # (https://keepachangelog.com/ru/0.3.0/)
 
+## [2.0.0] - 2026-08-26
 
-## 1.0.1 - 2025-05-07
+### Added
+- Добавлено Docker-окружение для разработки
+
+### Changed
+- Минимальная версия Laravel повышена до 11.0
+- Поддержка Laravel 11, 12, 13
+- Обновлены зависимости: `illuminate/notifications` и `illuminate/support` теперь поддерживают версии 11, 12, 13
+
+### Fixed
+
+### Deleted
+- Прекращена поддержка Laravel 10.x и более ранних версий.
+
+## [1.0.1] - 2025-05-07
 
 ### Added
 - Добавлен отчет об отправке уведомлений RuStoreReport в поджигаемых событиях
@@ -21,10 +35,9 @@
 - Исправлено поджигание события NotificationSent при отсутствии успешно отправленных сообщений
 - Fixed firing of NotificationSent event when there were no successfully sent messages
 
-[//]: # (### Deleted)
+### Deleted
 
 
-
-## 1.0.0 - 2025-05-06
+## [1.0.0] - 2025-05-06
 
 - initial release

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test\Feature;
@@ -29,9 +30,7 @@ class NotificationTest extends TestCase
         Notification::assertSentTo(
             $notifiable,
             TestNotification::class,
-            static function ($notification, $channels) {
-                return in_array(RuStoreChannel::class, $channels, true);
-            }
+            static fn($notification, $channels) => in_array(RuStoreChannel::class, $channels, true),
         );
     }
 }

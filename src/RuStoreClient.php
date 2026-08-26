@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
@@ -36,7 +37,7 @@ class RuStoreClient
     public function send(RuStoreMessage $message, array $tokens): RuStoreReport
     {
         $report = RuStoreReport::init($tokens, $message);
-        $report->all()->each(function (?RuStoreSingleReport $_, string $token) use ($report, $message) {
+        $report->all()->each(function (?RuStoreSingleReport $_, string $token) use ($report, $message): void {
             $report->addReport($token, $this->sendSingle($message, $token));
         });
 

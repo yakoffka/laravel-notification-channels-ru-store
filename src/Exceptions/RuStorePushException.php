@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Exceptions;
@@ -15,7 +16,7 @@ class RuStorePushException extends Exception
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $message = '', int $code = 0, Throwable $previous = null)
+    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
@@ -26,14 +27,14 @@ class RuStorePushException extends Exception
      */
     public static function fromResponse(PromiseInterface|Response $response): self
     {
-        $type = match(true) {
+        $type = match (true) {
             $response->redirect() => 'RuStoreRedirect',
             $response->clientError() => 'RuStoreClientError',
             $response->serverError() => 'RuStoreServerError',
         };
 
         return new self(
-            message: "$type: " . $response->getBody()->getContents(),
+            message: "{$type}: " . $response->getBody()->getContents(),
             code: $response->getStatusCode(),
         );
     }

@@ -1,0 +1,13 @@
+services:
+    php-82:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: php82-laravel_rustore_push
+        volumes:
+            - ./:/app
+        working_dir: /app
+        tty: true
+        command: tail -f /dev/null
+        environment:
+            - COMPOSER_MEMORY_LIMIT=-1

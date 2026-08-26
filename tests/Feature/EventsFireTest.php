@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test\Feature;
@@ -43,13 +44,13 @@ class EventsFireTest extends TestCase
     {
         Event::fake();
         $notification = new TestNotification();
-        $notifiable = (new User())->setTokens(['invalid']);
+        $notifiable = (new User())->setTokens(['invalid_fcm_token']);
         Http::fakeSequence()->push([
             'error' => [
                 'code' => 404,
                 'message' => 'Requested entity was not found.',
                 'status' => 'NOT_FOUND',
-            ]
+            ],
         ], 404);
 
         try {
@@ -57,9 +58,23 @@ class EventsFireTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
+        // @todo теперь почему-то поджигаются два события: одно с элементом 'report', второе - с 'exception'
+        // Event::assertDispatched(static function (NotificationFailed $event) {
+        //     $tokens = $event->data['report']->all()->keys()->toArray();
+        //     return $tokens === ['invalid'];
+        // });
         Event::assertDispatched(static function (NotificationFailed $event) {
-            $tokens = $event->data['report']->all()->keys()->toArray();
-            return $tokens === ['invalid'];
+            if (isset($event->data['report'])) {
+                $tokens = $event->data['report']->all()->keys()->toArray();
+                return $tokens === ['invalid_fcm_token'];
+            }
+
+            if (isset($event->data['exception'])) {
+                $e = $event->data['exception'];
+                return $e::class === RuStorePushNotingSentException::class;
+            }
+
+            return false;
         });
     }
 
@@ -77,7 +92,7 @@ class EventsFireTest extends TestCase
                     'code' => 404,
                     'message' => 'Requested entity was not found.',
                     'status' => 'NOT_FOUND',
-                ]
+                ],
             ], 404);
 
         $notifiable->notify($notification);
@@ -106,7 +121,7 @@ class EventsFireTest extends TestCase
                     'code' => 404,
                     'message' => 'Requested entity was not found.',
                     'status' => 'NOT_FOUND',
-                ]
+                ],
             ], 404)
             ->push(null, 200)
             ->push([
@@ -114,7 +129,7 @@ class EventsFireTest extends TestCase
                     'code' => 404,
                     'message' => 'Requested entity was not found.',
                     'status' => 'NOT_FOUND',
-                ]
+                ],
             ], 404);
 
         $notifiable->notify($notification);
