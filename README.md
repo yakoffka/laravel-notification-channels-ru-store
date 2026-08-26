@@ -1,29 +1,13 @@
 Please see [this repo](https://github.com/laravel-notification-channels/channels) for instructions on how to submit a channel proposal.
 
-[//]: # (# A Boilerplate repo for contributions)
-
-[//]: # ()
-[//]: # ([![Latest Version on Packagist]&#40;https://img.shields.io/packagist/v/laravel-notification-channels/ru-store.svg?style=flat-square&#41;]&#40;https://packagist.org/packages/laravel-notification-channels/ru-store&#41;)
-
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
-[//]: # ([![Build Status]&#40;https://img.shields.io/travis/laravel-notification-channels/ru-store/master.svg?style=flat-square&#41;]&#40;https://travis-ci.org/laravel-notification-channels/ru-store&#41;)
-
-[//]: # ([![StyleCI]&#40;https://styleci.io/repos/:style_ci_id/shield&#41;]&#40;https://styleci.io/repos/:style_ci_id&#41;)
-
-[//]: # ([![SensioLabsInsight]&#40;https://img.shields.io/sensiolabs/i/:sensio_labs_id.svg?style=flat-square&#41;]&#40;https://insight.sensiolabs.com/projects/:sensio_labs_id&#41;)
-
-[//]: # ([![Quality Score]&#40;https://img.shields.io/scrutinizer/g/laravel-notification-channels/ru-store.svg?style=flat-square&#41;]&#40;https://scrutinizer-ci.com/g/laravel-notification-channels/ru-store&#41;)
-
-[//]: # ([![Code Coverage]&#40;https://img.shields.io/scrutinizer/coverage/g/laravel-notification-channels/ru-store/master.svg?style=flat-square&#41;]&#40;https://scrutinizer-ci.com/g/laravel-notification-channels/ru-store/?branch=master&#41;)
-
-[//]: # ([![Total Downloads]&#40;https://img.shields.io/packagist/dt/laravel-notification-channels/ru-store.svg?style=flat-square&#41;]&#40;https://packagist.org/packages/laravel-notification-channels/ru-store&#41;)
-
-This package makes it easy to send notifications using [RuStore](link to service) with Laravel 10.x.
+This package makes it easy to send notifications using [RuStore](link to service) with Laravel .
 
 
 ## Contents
 
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Setting up the RuStore service](#setting-up-the-RuStore-service)
 - [Usage](#usage)
@@ -35,6 +19,11 @@ This package makes it easy to send notifications using [RuStore](link to service
 - [Credits](#credits)
 - [License](#license)
 
+## Requirements
+
+- PHP >= 8.2
+- Laravel / Illuminate >= 11.0
+
 
 ## Installation
 Установите пакет с помощью команды:
@@ -42,15 +31,11 @@ This package makes it easy to send notifications using [RuStore](link to service
   composer require yakoffka/laravel-notification-channels-ru-store
 ```
 
-Затем опубликуйте конфигурационный файл:
+Опубликуйте конфигурационный файл:
 ```bash
   php artisan vendor:publish --provider="NotificationChannels\RuStore\RuStoreServiceProvider"
 ```
-и обновите ваш .env, указав там значения, полученные в [RuStore консоли](https://console.rustore.ru/waiting)
-
-### Setting up the RuStore service
-
-Optionally include a few steps how users can set up the service.
+Обновите ваш .env, указав там значения, полученные в [RuStore консоли](https://console.rustore.ru/waiting)
 
 ## Usage
 

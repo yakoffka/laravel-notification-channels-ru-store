@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\NotificationFailed;
-use Illuminate\Support\Arr;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Arr;
 use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
 
@@ -16,9 +17,7 @@ class RuStoreChannel
      * @param Dispatcher $events
      * @param RuStoreClient $client
      */
-    public function __construct(protected Dispatcher $events, private readonly RuStoreClient $client)
-    {
-    }
+    public function __construct(protected Dispatcher $events, private readonly RuStoreClient $client) {}
 
     /**
      * Send the given notification.

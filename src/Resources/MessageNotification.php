@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Resources;
@@ -18,9 +19,8 @@ class MessageNotification extends RuStoreResource
     public function __construct(
         public ?string $title = null,
         public ?string $body = null,
-        public ?string $image = null
-    ) {
-    }
+        public ?string $image = null,
+    ) {}
 
     /**
      * @param string|null $title

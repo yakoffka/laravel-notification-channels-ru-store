@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore;
@@ -24,7 +25,5 @@ class RuStoreServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register(): void
-    {
-    }
+    public function register(): void {}
 }

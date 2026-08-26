@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test;
@@ -19,8 +20,10 @@ abstract class TestCase extends Orchestra
     {
         parent::setUp();
 
-        $this->app['config']->set('ru-store.project_id', env('RUSTORE_PROJECT_ID', 'test'));
-        $this->app['config']->set('ru-store.token', env('RUSTORE_TOKEN', 'test'));
+        // $this->app['config']->set('ru-store.project_id', env('RUSTORE_PROJECT_ID', 'test'));
+        // $this->app['config']->set('ru-store.token', env('RUSTORE_TOKEN', 'test'));
+        $this->app['config']->set('ru-store.project_id', 'Rx8IE0g5r-6-zhjWN0IixVacYM1TMI8q');
+        $this->app['config']->set('ru-store.token', 'jd447ZsYdcAIy29XJSQZXEmlr8at4VWgtGka225CxSqGIo-qfI4IQx0WHWhmRguJ');
     }
 
     /**

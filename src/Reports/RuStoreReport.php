@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Reports;
@@ -18,10 +19,8 @@ final class RuStoreReport
      */
     public function __construct(
         private Collection              $reports,
-        readonly private RuStoreMessage $message,
-    )
-    {
-    }
+        private readonly RuStoreMessage $message,
+    ) {}
 
     /**
      * Инициализация объекта
@@ -71,9 +70,9 @@ final class RuStoreReport
     public function getSuccess(): self
     {
         $success = clone $this;
-        $success->reports = $this->reports->filter(fn (RuStoreSingleReport $report) => $report->isSuccess());
+        $success->reports = $this->reports->filter(fn(RuStoreSingleReport $report) => $report->isSuccess());
 
-        if($success->reports->count() === 0) {
+        if ($success->reports->count() === 0) {
             throw new RuStorePushNotingSentException();
         }
 
@@ -88,7 +87,7 @@ final class RuStoreReport
     public function getFailure(): self
     {
         $failure = clone $this;
-        $failure->reports = $this->reports->filter(fn (RuStoreSingleReport $report) => $report->isFailure());
+        $failure->reports = $this->reports->filter(fn(RuStoreSingleReport $report) => $report->isFailure());
 
         return $failure;
     }

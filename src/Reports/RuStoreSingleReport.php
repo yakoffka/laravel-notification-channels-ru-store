@@ -18,11 +18,9 @@ final class RuStoreSingleReport
      * @param Throwable|null $error
      */
     public function __construct(
-        readonly private PromiseInterface|Response|null $response = null,
-        readonly private ?Throwable                     $error = null,
-    )
-    {
-    }
+        private readonly PromiseInterface|Response|null $response = null,
+        private readonly ?Throwable                     $error = null,
+    ) {}
 
     /**
      * Создание успешного отчета
@@ -44,7 +42,7 @@ final class RuStoreSingleReport
      * @param PromiseInterface|Response|null $response
      * @return self
      */
-    public static function failure(Throwable $error, null|PromiseInterface|Response $response = null): self
+    public static function failure(Throwable $error, PromiseInterface|Response|null $response = null): self
     {
         return new self(
             response: $response,
@@ -65,7 +63,7 @@ final class RuStoreSingleReport
      */
     public function isFailure(): bool
     {
-        return !$this->isSuccess();
+        return ! $this->isSuccess();
     }
 
     /**

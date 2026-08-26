@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test\Notifiable;
@@ -28,6 +29,7 @@ class User extends Authenticatable
      */
     public function routeNotificationForRuStore(): array
     {
-        return $this->tokens ?? [env('RUSTORE_EXAMPLE_PUSH_TOKEN', 'none')];
+        // return $this->tokens ?? [env('RUSTORE_EXAMPLE_PUSH_TOKEN', 'none')];
+        return $this->tokens ?? ['random-SGvffRwHWP1wx8a28crwU7ol4'];
     }
 }
