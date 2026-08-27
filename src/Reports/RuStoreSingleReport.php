@@ -14,10 +14,12 @@ use Throwable;
 final class RuStoreSingleReport
 {
     /**
+     * @param string $target
      * @param PromiseInterface|Response|null $response
      * @param Throwable|null $error
      */
     public function __construct(
+        private readonly string $target,
         private readonly PromiseInterface|Response|null $response = null,
         private readonly ?Throwable                     $error = null,
     ) {}
@@ -25,12 +27,14 @@ final class RuStoreSingleReport
     /**
      * Создание успешного отчета
      *
+     * @param string $target
      * @param PromiseInterface|Response $response
      * @return self
      */
-    public static function success(PromiseInterface|Response $response): self
+    public static function success(string $target, PromiseInterface|Response $response): self
     {
         return new self(
+            target: $target,
             response: $response,
         );
     }
@@ -38,13 +42,15 @@ final class RuStoreSingleReport
     /**
      * Создание отчета об ошибке
      *
+     * @param string $target
      * @param Throwable $error
      * @param PromiseInterface|Response|null $response
      * @return self
      */
-    public static function failure(Throwable $error, PromiseInterface|Response|null $response = null): self
+    public static function failure(string $target, Throwable $error, PromiseInterface|Response|null $response = null): self
     {
         return new self(
+            target: $target,
             response: $response,
             error: $error,
         );
@@ -64,6 +70,14 @@ final class RuStoreSingleReport
     public function isFailure(): bool
     {
         return ! $this->isSuccess();
+    }
+
+    /**
+     * @return string
+     */
+    public function target(): string
+    {
+        return $this->target;
     }
 
     /**

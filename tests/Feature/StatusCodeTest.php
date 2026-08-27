@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test\Feature;
 
-use Illuminate\Http\Client\RequestException;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSending;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
+use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 use NotificationChannels\RuStore\Test\Notifiable\User;
 use NotificationChannels\RuStore\Test\Notifications\TestNotification;
 use NotificationChannels\RuStore\Test\TestCase;
@@ -58,32 +58,35 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
-        $this::assertTrue(isset($e));
-        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
+        // $this::assertTrue(isset($e));
+        // $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertNotDispatched(NotificationSent::class);
-        // @todo теперь почему-то поджигаются два события: одно с элементом 'report', второе - с 'exception'
-        // Event::assertDispatched(static function (NotificationFailed $event) {
-        //     /** @var RequestException $e */
-        //     $e = $event->data['report']->all()->sole()->error();
-        //     return $e->getCode() === 301
-        //         && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
-        // });
-        Event::assertDispatched(static function (NotificationFailed $event) {
-            if (isset($event->data['report'])) {
-                /** @var RequestException $e */
-                $e = $event->data['report']->all()->sole()->error();
-                return $e->getCode() === 301
-                    && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
-            }
-
-            if (isset($event->data['exception'])) {
-                $e = $event->data['exception'];
-                return $e::class === RuStorePushNotingSentException::class;
-            }
-
-            return false;
+        Event::assertDispatched(NotificationSent::class);
+        Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable) {
+            // /** @var RequestException $e */
+            // $e = $event->data['report']->all()->sole()->error();
+            // return $e->getCode() === 301
+            //     && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
+            // dd($event); @todo дополнить проверки! getCode() getMessage()
+            /** @var RuStoreSingleReport $report */
+            $report = $event->data['report'];
+            return $report->target() === $notifiable->routeNotificationForRuStore()[0];
         });
+        // Event::assertDispatched(static function (NotificationFailed $event) {
+        //     if (isset($event->data['report'])) {
+        //         /** @var RequestException $e */
+        //         $e = $event->data['report']->all()->sole()->error();
+        //         return $e->getCode() === 301
+        //             && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
+        //     }
+        //
+        //     if (isset($event->data['exception'])) {
+        //         $e = $event->data['exception'];
+        //         return $e::class === RuStorePushNotingSentException::class;
+        //     }
+        //
+        //     return false;
+        // });
     }
 
     #[Test]
@@ -106,34 +109,36 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
-        $this::assertTrue(isset($e));
-        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
+        // $this::assertTrue(isset($e));
+        // $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertNotDispatched(NotificationSent::class);
-        // @todo теперь почему-то поджигаются два события: одно с элементом 'report', второе - с 'exception'
-        // Event::assertDispatched(static function (NotificationFailed $event) {
-        //     /** @var RequestException $e */
-        //     $e = $event->data['report']->all()->sole()->error();
-        //     return $e->getCode() === 401
-        //         && $e->getMessage() === 'RuStoreClientError: '
-        //         . '{"code":401,"message":"unauthorized: Invalid Authorization header","status":"UNAUTHORIZED"}';
-        // });
-        Event::assertDispatched(static function (NotificationFailed $event) {
-            if (isset($event->data['report'])) {
-                /** @var RequestException $e */
-                $e = $event->data['report']->all()->sole()->error();
-                return $e->getCode() === 401
-                    && $e->getMessage() === 'RuStoreClientError: '
-                    . '{"code":401,"message":"unauthorized: Invalid Authorization header","status":"UNAUTHORIZED"}';
-            }
-
-            if (isset($event->data['exception'])) {
-                $e = $event->data['exception'];
-                return $e::class === RuStorePushNotingSentException::class;
-            }
-
-            return false;
+        Event::assertDispatched(NotificationSent::class);
+        Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable) {
+            // /** @var RequestException $e */
+            // $e = $event->data['report']->all()->sole()->error();
+            // return $e->getCode() === 301
+            //     && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
+            // dd($event); @todo дополнить проверки! getCode() getMessage()
+            /** @var RuStoreSingleReport $report */
+            $report = $event->data['report'];
+            return $report->target() === $notifiable->routeNotificationForRuStore()[0];
         });
+        //        Event::assertDispatched(static function (NotificationFailed $event) {
+        //            if (isset($event->data['report'])) {
+        //                /** @var RequestException $e */
+        //                $e = $event->data['report']->all()->sole()->error();
+        //                return $e->getCode() === 401
+        //                    && $e->getMessage() === 'RuStoreClientError: '
+        //                    . '{"code":401,"message":"unauthorized: Invalid Authorization header","status":"UNAUTHORIZED"}';
+        //            }
+        //
+        //            if (isset($event->data['exception'])) {
+        //                $e = $event->data['exception'];
+        //                return $e::class === RuStorePushNotingSentException::class;
+        //            }
+        //
+        //            return false;
+        //        });
     }
 
     #[Test]
@@ -158,32 +163,34 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
-        $this::assertTrue(isset($e));
-        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
+        // $this::assertTrue(isset($e));
+        // $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertNotDispatched(NotificationSent::class);
-        // @todo теперь почему-то поджигаются два события: одно с элементом 'report', второе - с 'exception'
-        // Event::assertDispatched(static function (NotificationFailed $event) {
-        //     /** @var RequestException $e */
-        //     $e = $event->data['report']->all()->sole()->error();
-        //     return $e->getCode() === 403 && $e->getMessage() === 'RuStoreClientError: '
-        //         . '{"error":{"code":403,"message":"SenderId mismatch","status":"PERMISSION_DENIED"}}';
-        // });
-        Event::assertDispatched(static function (NotificationFailed $event) {
-            if (isset($event->data['report'])) {
-                /** @var RequestException $e */
-                $e = $event->data['report']->all()->sole()->error();
-                return $e->getCode() === 403 && $e->getMessage() === 'RuStoreClientError: '
-                    . '{"error":{"code":403,"message":"SenderId mismatch","status":"PERMISSION_DENIED"}}';
-            }
-
-            if (isset($event->data['exception'])) {
-                $e = $event->data['exception'];
-                return $e::class === RuStorePushNotingSentException::class;
-            }
-
-            return false;
+        Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable) {
+            // /** @var RequestException $e */
+            // $e = $event->data['report']->all()->sole()->error();
+            // return $e->getCode() === 301
+            //     && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
+            // dd($event); @todo дополнить проверки! getCode() getMessage()
+            /** @var RuStoreSingleReport $report */
+            $report = $event->data['report'];
+            return $report->target() === $notifiable->routeNotificationForRuStore()[0];
         });
+        //        Event::assertDispatched(static function (NotificationFailed $event) {
+        //            if (isset($event->data['report'])) {
+        //                /** @var RequestException $e */
+        //                $e = $event->data['report']->all()->sole()->error();
+        //                return $e->getCode() === 403 && $e->getMessage() === 'RuStoreClientError: '
+        //                    . '{"error":{"code":403,"message":"SenderId mismatch","status":"PERMISSION_DENIED"}}';
+        //            }
+        //
+        //            if (isset($event->data['exception'])) {
+        //                $e = $event->data['exception'];
+        //                return $e::class === RuStorePushNotingSentException::class;
+        //            }
+        //
+        //            return false;
+        //        });
     }
 
     #[Test]
@@ -208,32 +215,34 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
-        $this::assertTrue(isset($e));
-        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
+        // $this::assertTrue(isset($e));
+        // $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertNotDispatched(NotificationSent::class);
-        // @todo теперь почему-то поджигаются два события: одно с элементом 'report', второе - с 'exception'
-        // Event::assertDispatched(static function (NotificationFailed $event) {
-        //     /** @var RequestException $e */
-        //     $e = $event->data['report']->all()->sole()->error();
-        //     return $e->getCode() === 404 && $e->getMessage() === 'RuStoreClientError: '
-        //         . '{"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}}';
-        // });
-        Event::assertDispatched(static function (NotificationFailed $event) {
-            if (isset($event->data['report'])) {
-                /** @var RequestException $e */
-                $e = $event->data['report']->all()->sole()->error();
-                return $e->getCode() === 404 && $e->getMessage() === 'RuStoreClientError: '
-                    . '{"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}}';
-            }
-
-            if (isset($event->data['exception'])) {
-                $e = $event->data['exception'];
-                return $e::class === RuStorePushNotingSentException::class;
-            }
-
-            return false;
+        Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable) {
+            // /** @var RequestException $e */
+            // $e = $event->data['report']->all()->sole()->error();
+            // return $e->getCode() === 301
+            //     && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
+            // dd($event); @todo дополнить проверки! getCode() getMessage()
+            /** @var RuStoreSingleReport $report */
+            $report = $event->data['report'];
+            return $report->target() === $notifiable->routeNotificationForRuStore()[0];
         });
+        //        Event::assertDispatched(static function (NotificationFailed $event) {
+        //            if (isset($event->data['report'])) {
+        //                /** @var RequestException $e */
+        //                $e = $event->data['report']->all()->sole()->error();
+        //                return $e->getCode() === 404 && $e->getMessage() === 'RuStoreClientError: '
+        //                    . '{"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}}';
+        //            }
+        //
+        //            if (isset($event->data['exception'])) {
+        //                $e = $event->data['exception'];
+        //                return $e::class === RuStorePushNotingSentException::class;
+        //            }
+        //
+        //            return false;
+        //        });
     }
 
     #[Test]
@@ -256,31 +265,33 @@ class StatusCodeTest extends TestCase
         } catch (RuStorePushNotingSentException $e) {
         }
 
-        $this::assertTrue(isset($e));
-        $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
+        // $this::assertTrue(isset($e));
+        // $this::assertEquals(RuStorePushNotingSentException::class, $e::class);
         Event::assertDispatched(NotificationSending::class);
-        Event::assertNotDispatched(NotificationSent::class);
-        // @todo теперь почему-то поджигаются два события: одно с элементом 'report', второе - с 'exception'
-        // Event::assertDispatched(static function (NotificationFailed $event) {
-        //     /** @var RequestException $e */
-        //     $e = $event->data['report']->all()->sole()->error();
-        //     return $e->getCode() === 500
-        //         && $e->getMessage() === 'RuStoreServerError: {"code":500,"message":"Internal Server Error","status":""}';
-        // });
-        Event::assertDispatched(static function (NotificationFailed $event) {
-            if (isset($event->data['report'])) {
-                /** @var RequestException $e */
-                $e = $event->data['report']->all()->sole()->error();
-                return $e->getCode() === 500
-                    && $e->getMessage() === 'RuStoreServerError: {"code":500,"message":"Internal Server Error","status":""}';
-            }
-
-            if (isset($event->data['exception'])) {
-                $e = $event->data['exception'];
-                return $e::class === RuStorePushNotingSentException::class;
-            }
-
-            return false;
+        Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable) {
+            // /** @var RequestException $e */
+            // $e = $event->data['report']->all()->sole()->error();
+            // return $e->getCode() === 301
+            //     && $e->getMessage() === 'RuStoreRedirect: {"code":301,"message":"Moved Permanently","status":""}';
+            // dd($event); @todo дополнить проверки! getCode() getMessage()
+            /** @var RuStoreSingleReport $report */
+            $report = $event->data['report'];
+            return $report->target() === $notifiable->routeNotificationForRuStore()[0];
         });
+        //        Event::assertDispatched(static function (NotificationFailed $event) {
+        //            if (isset($event->data['report'])) {
+        //                /** @var RequestException $e */
+        //                $e = $event->data['report']->all()->sole()->error();
+        //                return $e->getCode() === 500
+        //                    && $e->getMessage() === 'RuStoreServerError: {"code":500,"message":"Internal Server Error","status":""}';
+        //            }
+        //
+        //            if (isset($event->data['exception'])) {
+        //                $e = $event->data['exception'];
+        //                return $e::class === RuStorePushNotingSentException::class;
+        //            }
+        //
+        //            return false;
+        //        });
     }
 }

@@ -128,10 +128,10 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
 
 #### Проверка отправки уведомлений
 Для контроля отправляемых уведомлений можно воспользоваться событиями, поджигаемыми после отправки:
-- cобытие NotificationSent содержит отчет RuStoreReport в свойстве response: ```$report = $event->response;```
-- cобытие NotificationFailed содержит отчет RuStoreReport в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
+- cобытие NotificationSent содержит коллекцию отчетов RuStoreSingleReport в свойстве response: ```$report = $event->response;```
+- cобытие NotificationFailed содержит коллекцию отчетов RuStoreSingleReport в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
 
-Метод RuStoreReport::all() вернет коллекцию отчетов RuStoreSingleReport об отправке уведомлений на конкретное устройство с push-токенами в качестве ключей
+Коллекция отчетов RuStoreSingleReport содержит данные об отправке уведомлений на конкретное устройство с push-токенами в качестве ключей
 
 Пример использования события NotificationSent:
 ```php
@@ -153,7 +153,7 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
      */
     public function handleRuStoreSuccess(NotificationSent $event): void
     {
-        /** @var RuStoreReport $report */
+        /** @var RuStoreReport $report */ // @todo исправить!
         $report = $event->response;
 
         $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {
@@ -192,7 +192,7 @@ NOTE: Событие NotificationSent поджигается только в с�
      */
     private function handleRuStoreFailed(NotificationFailed $event): void
     {
-        /** @var RuStoreReport $report */
+        /** @var RuStoreReport $report */ // @todo исправить!
         $report = Arr::get($event->data, 'report');
 
         $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {

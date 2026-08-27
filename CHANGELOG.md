@@ -7,7 +7,8 @@
 ### Added
 
 ### Changed
-- Изменено поведение при пустом списке токенов пользователя: вместо выброса исключения RuStorePushNotingSentException возвращается null, что приводит к более ожидаемому поджиганию события NotificationSent с $event->response === null
+- Изменено поведение при пустом списке токенов пользователя: вместо выброса исключения RuStorePushNotingSentException возвращается null, что приводит к более ожидаемому поджиганию события NotificationSent с пустой коллекцией в $event->response
+- Класс RuStoreSingleReport дополнен методом target(), содержащим значение ru-store-push токена
 
 ### Fixed
 

@@ -8,8 +8,9 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
-use NotificationChannels\RuStore\Reports\RuStoreReport;
+use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 
 class RuStoreChannel
 {
@@ -25,34 +26,46 @@ class RuStoreChannel
      * @param mixed $notifiable
      * @param Notification $notification
      *
-     * @return RuStoreReport|null
+     * @return Collection<int, RuStoreSingleReport>
      * @throws RuStorePushNotingSentException
      */
-    public function send(mixed $notifiable, Notification $notification): ?RuStoreReport
+    public function send(mixed $notifiable, Notification $notification): Collection
     {
+        $message = $notification->toRuStore($notifiable);
+
         $tokens = Arr::wrap($notifiable->routeNotificationForRuStore());
         if (count($tokens) === 0) {
-            return null;
+            return collect();
         }
 
-        $message = $notification->toRuStore($notifiable);
-        $report = $this->client->send($message, $tokens);
-        $this->dispatchFailedNotification($notifiable, $notification, $report->getFailure());
+        // $report = $this->client->send($message, $tokens);
+        // $this->dispatchFailedNotification($notifiable, $notification, $report->getFailure());
 
-        return $report->getSuccess();
+        $return = $this->client->send($message, $tokens)
+            // ->each(function($a, $b) {
+            //     dump($b, $a);
+            //     return $a;
+            // })
+            ->each(fn(RuStoreSingleReport $report) => $this->dispatchFailedNotification($notifiable, $notification, $report))
+            ->filter(fn(RuStoreSingleReport $report) => $report->isSuccess())
+            ->values();
+
+        // dump($return);
+
+        return $return;
     }
 
     /**
-     * Поджигание события NotificationFailed
+     * Поджигание события NotificationFailed для проваленных отправок
      *
      * @param mixed $notifiable
      * @param Notification $notification
-     * @param RuStoreReport $report
+     * @param RuStoreSingleReport $report
      * @return void
      */
-    private function dispatchFailedNotification(mixed $notifiable, Notification $notification, RuStoreReport $report): void
+    private function dispatchFailedNotification(mixed $notifiable, Notification $notification, RuStoreSingleReport $report): void
     {
-        if ($report->all()->isNotEmpty()) {
+        if ($report->isFailure()) {
             $this->events->dispatch(new NotificationFailed($notifiable, $notification, self::class, [
                 'report' => $report,
             ]));
