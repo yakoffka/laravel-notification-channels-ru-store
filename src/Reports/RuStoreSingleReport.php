@@ -11,7 +11,7 @@ use Throwable;
 /**
  * Отчет об отправке уведомления на одно из устройств пользователя
  */
-final class RuStoreSingleReport
+final readonly class RuStoreSingleReport
 {
     /**
      * @param string $target
@@ -19,9 +19,9 @@ final class RuStoreSingleReport
      * @param Throwable|null $error
      */
     public function __construct(
-        private readonly string $target,
-        private readonly PromiseInterface|Response|null $response = null,
-        private readonly ?Throwable                     $error = null,
+        private string                         $target,
+        private PromiseInterface|Response|null $response = null,
+        private ?Throwable                 $error = null,
     ) {}
 
     /**

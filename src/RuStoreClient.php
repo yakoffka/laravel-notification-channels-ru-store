@@ -38,7 +38,6 @@ class RuStoreClient
     public function send(RuStoreMessage $message, array $tokens): Collection
     {
         // @todo проверить тип $token!
-        // return collect(array_combine($tokens, $tokens))
         return collect($tokens)->map(fn(string $token): RuStoreSingleReport => $this->sendSingle($message, $token));
     }
 
@@ -59,8 +58,6 @@ class RuStoreClient
         } catch (Throwable $exception) {
             return RuStoreSingleReport::failure($token, $exception);
         }
-
-        // dump($response->successful());
 
         return $response->successful()
             ? RuStoreSingleReport::success($token, $response)

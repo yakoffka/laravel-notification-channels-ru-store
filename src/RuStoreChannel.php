@@ -32,27 +32,12 @@ class RuStoreChannel
     public function send(mixed $notifiable, Notification $notification): Collection
     {
         $message = $notification->toRuStore($notifiable);
-
         $tokens = Arr::wrap($notifiable->routeNotificationForRuStore());
-        if (count($tokens) === 0) {
-            return collect();
-        }
 
-        // $report = $this->client->send($message, $tokens);
-        // $this->dispatchFailedNotification($notifiable, $notification, $report->getFailure());
-
-        $return = $this->client->send($message, $tokens)
-            // ->each(function($a, $b) {
-            //     dump($b, $a);
-            //     return $a;
-            // })
+        return $this->client->send($message, $tokens)
             ->each(fn(RuStoreSingleReport $report) => $this->dispatchFailedNotification($notifiable, $notification, $report))
             ->filter(fn(RuStoreSingleReport $report) => $report->isSuccess())
             ->values();
-
-        // dump($return);
-
-        return $return;
     }
 
     /**
