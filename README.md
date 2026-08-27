@@ -43,8 +43,8 @@ This package makes it easy to send notifications using [RuStore](link to service
 
 ```php
     /**
-     * Получение массива ru-store пуш-токенов, полученных пользователем.
-     * Используется пакетом laravel-notification-channels/rustore
+     * Получение массива ru-store-push токенов пользователя.
+     * Используется пакетом yakoffka/laravel-notification-channels-ru-store (laravel-notification-channels/rustore)
      *
      * @return array
      */
