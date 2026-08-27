@@ -24,6 +24,13 @@ class User extends Authenticatable
         return $this;
     }
 
+    public function unsetTokens(): self
+    {
+        $this->tokens = [];
+
+        return $this;
+    }
+
     /**
      * @return array
      */

@@ -25,13 +25,17 @@ class RuStoreChannel
      * @param mixed $notifiable
      * @param Notification $notification
      *
-     * @return RuStoreReport
+     * @return RuStoreReport|null
      * @throws RuStorePushNotingSentException
      */
-    public function send(mixed $notifiable, Notification $notification): RuStoreReport
+    public function send(mixed $notifiable, Notification $notification): ?RuStoreReport
     {
-        $message = $notification->toRuStore($notifiable);
         $tokens = Arr::wrap($notifiable->routeNotificationForRuStore());
+        if (count($tokens) === 0) {
+            return null;
+        }
+
+        $message = $notification->toRuStore($notifiable);
         $report = $this->client->send($message, $tokens);
         $this->dispatchFailedNotification($notifiable, $notification, $report->getFailure());
 

@@ -21,6 +21,20 @@ use PHPUnit\Framework\Attributes\TestDox;
 class EventsFireTest extends TestCase
 {
     #[Test]
+    #[TestDox('Попытка отправки уведомления на пустом списке токенов')]
+    public function eventsFireOnEmptyListSuccess(): void
+    {
+        Event::fake();
+        $notification = new TestNotification();
+        $notifiable = (new User())->unsetTokens();
+
+        $notifiable->notify($notification);
+
+        Event::assertDispatched(static fn(NotificationSent $event) =>  $event->response === null);
+        Event::assertNotDispatched(NotificationFailed::class);
+    }
+
+    #[Test]
     #[TestDox('Успешная отправка уведомления на одно устройство. NotificationFailed не поджигается')]
     public function eventsFireOnOnlyOneSuccess(): void
     {

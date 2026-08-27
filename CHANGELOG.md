@@ -2,6 +2,18 @@
 
 [//]: # (https://keepachangelog.com/ru/0.3.0/)
 
+## Unreleased
+
+### Added
+
+### Changed
+- Изменено поведение при пустом списке токенов пользователя: вместо выброса исключения RuStorePushNotingSentException возвращается null, что приводит к более ожидаемому поджиганию события NotificationSent с $event->response === null
+
+### Fixed
+
+### Deleted
+- Прекращена поддержка Laravel 10.x и более ранних версий.
+
 ## [2.0.0] - 2026-08-26
 
 ### Added
