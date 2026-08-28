@@ -6,19 +6,24 @@
 
 ### Added
 
+- Добавлена валидация полученных ru-store-push токенов перед отправкой запроса.
 - Добавлена детализация исключений для ошибочных ответов RuStore: `InvalidArgumentException`, `NotFoundException`,
-  `PermissionDeniedException`, `RuStoreInternalException`, `TooManyRequestsException`, `UnexpectedException`.
+  `PermissionDeniedException`, `RuStoreInternalException`, `TooManyRequestsException`, `UnexpectedException`,
+  `MessageTooLargeException`, `InvalidPushTokenException`.
 - Добавлен `ResponseExceptionMapper`, преобразующий ошибочные HTTP-ответы RuStore в специализированные исключения.
+- Добавлена локальная проверка максимального объема сообщения RuStore перед отправкой HTTP-запроса.
+- Добавлена локальная проверка ru-store-push токенов: токен должен быть непустой строкой не больше 64 байт.
+- Добавлен `RuStoreMessageValidator`, отвечающий за локальную валидацию ru-store-push токенов и размера сообщения.
 - Класс `RuStoreReport` дополнен методом `target()`, возвращающим ru-store-push токен, для которого сформирован отчет.
 
 ### Changed
 
 - **Breaking:** `RuStoreChannel::send()` и `RuStoreClient::send()` теперь возвращают коллекцию отчетов
-  `RuStoreReport` об отправке уведомления на один адрес, а не агрегирующий отчет `RuStoreReport`.
-- **Breaking:** событие `NotificationSent` теперь также содержит коллекцию успешных отчетов `RuStoreReport` об отправке уведомления на один адрес в
-  `$event->response`, а не агрегирующий объект `RuStoreReport`.
+  `RuStoreReport` по отдельным ru-store-push токенам, а не агрегирующий отчет `RuStoreReport`.
+- **Breaking:** событие `NotificationSent` теперь содержит коллекцию успешных отчетов `RuStoreReport` по отдельным
+  ru-store-push токенам в `$event->response`, а не агрегирующий объект `RuStoreReport`.
 - **Breaking:** событие `NotificationFailed` теперь поджигается отдельно для каждой неуспешной отправки и содержит один
-  отчет `RuStoreReport` об отправке уведомления на один адрес в `$event->data['report']`, а не агрегирующий объект `RuStoreReport`.
+  отчет `RuStoreReport` по ru-store-push токену в `$event->data['report']`, а не агрегирующий объект `RuStoreReport`.
 - Изменено поведение при пустом списке токенов пользователя: вместо выброса исключения
   `RuStorePushNotingSentException` отправка завершается пустой коллекцией в `$event->response` события
   `NotificationSent`.
