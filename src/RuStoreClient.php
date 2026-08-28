@@ -47,11 +47,8 @@ class RuStoreClient
      */
     public function sendSingle(RuStoreMessage $message, mixed $token): RuStoreReport
     {
-        $target = $this->reportTarget($token);
-
         try {
             $token = $this->validator->validateToken($token);
-            $target = $token;
             $payload = $message->getPayload($token);
             $this->validator->ensureMessageFitsLimit($payload);
 
@@ -60,9 +57,9 @@ class RuStoreClient
             $response = $request->send('POST', $this->url);
 
         } catch (InvalidPushTokenException $exception) {
-            return RuStoreReport::failure($target, $exception);
+            return RuStoreReport::failure($this->reportTarget($token), $exception);
         } catch (Throwable $exception) {
-            return RuStoreReport::failure($target, $exception); // @todo протестировать!
+            return RuStoreReport::failure($this->reportTarget($token), $exception); // @todo протестировать!
         }
 
         return $response->successful()

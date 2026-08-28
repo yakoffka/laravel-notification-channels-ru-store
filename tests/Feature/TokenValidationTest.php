@@ -49,6 +49,10 @@ class TokenValidationTest extends TestCase
                 'Invalid RuStore push token: token size is 65 bytes, maximum allowed is 64 bytes',
             ],
             [
+                true,
+                'Invalid RuStore push token: expected string, got bool',
+            ],
+            [
                 [],
                 'Invalid RuStore push token: expected string, got array',
             ],
