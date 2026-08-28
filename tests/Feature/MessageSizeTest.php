@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\Exceptions\MessageTooLargeException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
-use NotificationChannels\RuStore\RuStoreClient;
 use NotificationChannels\RuStore\RuStoreMessage;
+use NotificationChannels\RuStore\RuStoreMessageValidator;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
 use NotificationChannels\RuStore\Test\TestNotification;
@@ -32,7 +32,7 @@ class MessageSizeTest extends TestCase
         $notifiable = (new TestNotifiableModel())->setTokens();
         $token = $notifiable->routeNotificationForRuStore()[0];
         $payload = new RuStoreMessage(data: ['body' => '']);
-        $bodyBytes = RuStoreClient::MAX_MESSAGE_BYTES - mb_strlen($payload->getPayload($token), '8bit');
+        $bodyBytes = RuStoreMessageValidator::MAX_MESSAGE_BYTES - mb_strlen($payload->getPayload($token), '8bit');
         $notification = new class ($bodyBytes) extends TestNotification {
             public function __construct(private readonly int $bodyBytes) {}
 
@@ -45,10 +45,10 @@ class MessageSizeTest extends TestCase
         $notifiable->notify($notification);
 
         $this->assertEquals(
-            RuStoreClient::MAX_MESSAGE_BYTES,
+            RuStoreMessageValidator::MAX_MESSAGE_BYTES,
             mb_strlen($notification->toRuStore($notifiable)->getPayload($token), '8bit'),
         );
-        Http::assertSent(static fn($request) => mb_strlen($request->body(), '8bit') === RuStoreClient::MAX_MESSAGE_BYTES);
+        Http::assertSent(static fn($request) => mb_strlen($request->body(), '8bit') === RuStoreMessageValidator::MAX_MESSAGE_BYTES);
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) use ($token) {
             /** @var RuStoreReport $report */
@@ -70,7 +70,7 @@ class MessageSizeTest extends TestCase
         $notifiable = (new TestNotifiableModel())->setTokens();
         $token = $notifiable->routeNotificationForRuStore()[0];
         $payload = new RuStoreMessage(data: ['body' => '']);
-        $bodyBytes = RuStoreClient::MAX_MESSAGE_BYTES - mb_strlen($payload->getPayload($token), '8bit') + 1;
+        $bodyBytes = RuStoreMessageValidator::MAX_MESSAGE_BYTES - mb_strlen($payload->getPayload($token), '8bit') + 1;
         $notification = new class ($bodyBytes) extends TestNotification {
             public function __construct(private readonly int $bodyBytes) {}
 
@@ -83,7 +83,7 @@ class MessageSizeTest extends TestCase
         $notifiable->notify($notification);
 
         $this->assertEquals(
-            RuStoreClient::MAX_MESSAGE_BYTES + 1,
+            RuStoreMessageValidator::MAX_MESSAGE_BYTES + 1,
             mb_strlen($notification->toRuStore($notifiable)->getPayload($token), '8bit'),
         );
         Http::assertNothingSent();
@@ -97,8 +97,8 @@ class MessageSizeTest extends TestCase
             return $report->isFailure()
                 && $report->response() === null
                 && $report->error() instanceof MessageTooLargeException
-                && $report->error()->actualBytes() > RuStoreClient::MAX_MESSAGE_BYTES
-                && $report->error()->maxBytes() === RuStoreClient::MAX_MESSAGE_BYTES;
+                && $report->error()->actualBytes() > RuStoreMessageValidator::MAX_MESSAGE_BYTES
+                && $report->error()->maxBytes() === RuStoreMessageValidator::MAX_MESSAGE_BYTES;
         });
     }
 }
