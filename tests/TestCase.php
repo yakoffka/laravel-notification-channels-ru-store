@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test;
 
+use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\RuStoreServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -19,6 +20,7 @@ abstract class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
+        Http::preventStrayRequests();
 
         // $this->app['config']->set('ru-store.project_id', env('RUSTORE_PROJECT_ID', 'test'));
         // $this->app['config']->set('ru-store.token', env('RUSTORE_TOKEN', 'test'));

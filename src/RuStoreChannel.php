@@ -8,7 +8,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
-use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
+use Illuminate\Support\Collection;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
 
 class RuStoreChannel
@@ -25,21 +25,21 @@ class RuStoreChannel
      * @param mixed $notifiable
      * @param Notification $notification
      *
-     * @return RuStoreReport
-     * @throws RuStorePushNotingSentException
+     * @return Collection<int, RuStoreReport>
      */
-    public function send(mixed $notifiable, Notification $notification): RuStoreReport
+    public function send(mixed $notifiable, Notification $notification): Collection
     {
         $message = $notification->toRuStore($notifiable);
         $tokens = Arr::wrap($notifiable->routeNotificationForRuStore());
-        $report = $this->client->send($message, $tokens);
-        $this->dispatchFailedNotification($notifiable, $notification, $report->getFailure());
 
-        return $report->getSuccess();
+        return $this->client->send($message, $tokens)
+            ->each(fn(RuStoreReport $report) => $this->dispatchFailedNotification($notifiable, $notification, $report))
+            ->filter(fn(RuStoreReport $report) => $report->isSuccess())
+            ->values();
     }
 
     /**
-     * Поджигание события NotificationFailed
+     * Поджигание события NotificationFailed для проваленных отправок
      *
      * @param mixed $notifiable
      * @param Notification $notification
@@ -48,7 +48,7 @@ class RuStoreChannel
      */
     private function dispatchFailedNotification(mixed $notifiable, Notification $notification, RuStoreReport $report): void
     {
-        if ($report->all()->isNotEmpty()) {
+        if ($report->isFailure()) {
             $this->events->dispatch(new NotificationFailed($notifiable, $notification, self::class, [
                 'report' => $report,
             ]));

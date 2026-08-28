@@ -6,10 +6,9 @@ namespace NotificationChannels\RuStore;
 
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use NotificationChannels\RuStore\Exceptions\RuStorePushException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 use Throwable;
 
 class RuStoreClient
@@ -17,6 +16,7 @@ class RuStoreClient
     // @todo задействовать проверку максимального объема сообщения
     public const MAX_PAYLOAD_LENGTH = 4096;
 
+    // @todo вынести в настройки?
     private const URL_FORMAT = 'https://vkpns.rustore.ru/v1/projects/%s/messages:send';
     private readonly string $url;
     private readonly string $bearer_token;
@@ -31,17 +31,13 @@ class RuStoreClient
      * Отправка уведомлений на все устройства пользователя
      *
      * @param RuStoreMessage $message
-     * @param array $tokens
-     * @return RuStoreReport
+     * @param array<int, string> $tokens
+     * @return Collection<int, RuStoreReport>
      */
-    public function send(RuStoreMessage $message, array $tokens): RuStoreReport
+    public function send(RuStoreMessage $message, array $tokens): Collection
     {
-        $report = RuStoreReport::init($tokens, $message);
-        $report->all()->each(function (?RuStoreSingleReport $_, string $token) use ($report, $message): void {
-            $report->addReport($token, $this->sendSingle($message, $token));
-        });
-
-        return $report;
+        // @todo проверить тип $token!
+        return collect($tokens)->map(fn(string $token): RuStoreReport => $this->sendSingle($message, $token));
     }
 
     /**
@@ -49,9 +45,9 @@ class RuStoreClient
      *
      * @param RuStoreMessage $message
      * @param string $token
-     * @return RuStoreSingleReport
+     * @return RuStoreReport
      */
-    public function sendSingle(RuStoreMessage $message, string $token): RuStoreSingleReport
+    public function sendSingle(RuStoreMessage $message, string $token): RuStoreReport
     {
         try {
             $request = Http::withToken($this->bearer_token)->withBody($message->getPayload($token));
@@ -59,11 +55,11 @@ class RuStoreClient
             $response = $request->send('POST', $this->url);
 
         } catch (Throwable $exception) {
-            return RuStoreSingleReport::failure($exception);
+            return RuStoreReport::failure($token, $exception); // @todo протестировать!
         }
 
         return $response->successful()
-            ? RuStoreSingleReport::success($response)
-            : RuStoreSingleReport::failure(RuStorePushException::fromResponse($response), $response);
+            ? RuStoreReport::success($token, $response)
+            : RuStoreReport::failure($token, ResponseExceptionMapper::map($response), $response);
     }
 }
