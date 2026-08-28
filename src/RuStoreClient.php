@@ -8,13 +8,13 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use NotificationChannels\RuStore\Exceptions\MessageTooLargeException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
 use Throwable;
 
 class RuStoreClient
 {
-    // @todo задействовать проверку максимального объема сообщения
-    public const MAX_PAYLOAD_LENGTH = 4096;
+    public const MAX_MESSAGE_BYTES = 4096;
 
     // @todo вынести в настройки?
     private const URL_FORMAT = 'https://vkpns.rustore.ru/v1/projects/%s/messages:send';
@@ -50,7 +50,10 @@ class RuStoreClient
     public function sendSingle(RuStoreMessage $message, string $token): RuStoreReport
     {
         try {
-            $request = Http::withToken($this->bearer_token)->withBody($message->getPayload($token));
+            $payload = $message->getPayload($token);
+            $this->ensureMessageFitsLimit($payload);
+
+            $request = Http::withToken($this->bearer_token)->withBody($payload);
             /** @var PromiseInterface|Response $response */
             $response = $request->send('POST', $this->url);
 
@@ -61,5 +64,19 @@ class RuStoreClient
         return $response->successful()
             ? RuStoreReport::success($token, $response)
             : RuStoreReport::failure($token, ResponseExceptionMapper::map($response), $response);
+    }
+
+    /**
+     * @param string $payload
+     * @return void
+     * @throws MessageTooLargeException
+     */
+    private function ensureMessageFitsLimit(string $payload): void
+    {
+        $bytes = mb_strlen($payload, '8bit');
+
+        if ($bytes > self::MAX_MESSAGE_BYTES) {
+            throw new MessageTooLargeException($bytes, self::MAX_MESSAGE_BYTES);
+        }
     }
 }
