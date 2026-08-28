@@ -10,10 +10,10 @@
 - Добавлена детализация исключений для ошибочных ответов RuStore: `InvalidArgumentException`, `NotFoundException`,
   `PermissionDeniedException`, `RuStoreInternalException`, `TooManyRequestsException`, `UnexpectedException`,
   `MessageTooLargeException`, `InvalidPushTokenException`.
-- Добавлен `ResponseExceptionMapper`, преобразующий ошибочные HTTP-ответы RuStore в специализированные исключения.
+- Добавлен `Services\ResponseExceptionMapper`, преобразующий ошибочные HTTP-ответы RuStore в специализированные исключения.
 - Добавлена локальная проверка максимального объема сообщения RuStore перед отправкой HTTP-запроса.
 - Добавлена локальная проверка ru-store-push токенов: токен должен быть непустой строкой не больше 64 байт.
-- Добавлен `RuStoreMessageValidator`, отвечающий за локальную валидацию ru-store-push токенов и размера сообщения.
+- Добавлен `Services\RuStoreMessageValidator`, отвечающий за локальную валидацию ru-store-push токенов и размера сообщения.
 - Класс `RuStoreReport` дополнен методом `target()`, возвращающим ru-store-push токен, для которого сформирован отчет.
 
 ### Changed

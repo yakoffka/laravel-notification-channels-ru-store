@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\Exceptions\MessageTooLargeException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
 use NotificationChannels\RuStore\RuStoreMessage;
-use NotificationChannels\RuStore\RuStoreMessageValidator;
+use NotificationChannels\RuStore\Services\RuStoreMessageValidator;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
 use NotificationChannels\RuStore\Test\TestNotification;

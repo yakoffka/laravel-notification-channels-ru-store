@@ -10,6 +10,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\Exceptions\InvalidPushTokenException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
+use NotificationChannels\RuStore\Services\ResponseExceptionMapper;
+use NotificationChannels\RuStore\Services\RuStoreMessageValidator;
 use Throwable;
 
 class RuStoreClient

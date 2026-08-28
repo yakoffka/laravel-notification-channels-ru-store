@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\Exceptions\InvalidPushTokenException;
 use NotificationChannels\RuStore\Reports\RuStoreReport;
-use NotificationChannels\RuStore\RuStoreMessageValidator;
+use NotificationChannels\RuStore\Services\RuStoreMessageValidator;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
 use NotificationChannels\RuStore\Test\TestNotification;

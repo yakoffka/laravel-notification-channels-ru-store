@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NotificationChannels\RuStore;
+namespace NotificationChannels\RuStore\Services;
 
 use NotificationChannels\RuStore\Exceptions\InvalidPushTokenException;
 use NotificationChannels\RuStore\Exceptions\MessageTooLargeException;
