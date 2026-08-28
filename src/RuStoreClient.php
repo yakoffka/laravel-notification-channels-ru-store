@@ -14,6 +14,9 @@ use Throwable;
 
 class RuStoreClient
 {
+    /**
+     * Максимальный объем сообщения 4096 байт
+     */
     public const MAX_MESSAGE_BYTES = 4096;
 
     // @todo вынести в настройки?
