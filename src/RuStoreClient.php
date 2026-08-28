@@ -8,7 +8,6 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use NotificationChannels\RuStore\Exceptions\RuStorePushException;
 use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 use Throwable;
 
@@ -61,6 +60,6 @@ class RuStoreClient
 
         return $response->successful()
             ? RuStoreSingleReport::success($token, $response)
-            : RuStoreSingleReport::failure($token, RuStorePushException::fromResponse($response), $response);
+            : RuStoreSingleReport::failure($token, ResponseExceptionMapper::map($response), $response);
     }
 }

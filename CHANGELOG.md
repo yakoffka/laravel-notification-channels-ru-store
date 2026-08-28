@@ -6,6 +6,9 @@
 
 ### Added
 
+- Добавлена детализация исключений: InvalidArgumentException, NotFoundException, etc, облегчающая обработку события
+  NotificationFailed
+
 ### Changed
 
 - Изменено поведение при пустом списке токенов пользователя: вместо выброса исключения RuStorePushNotingSentException
@@ -16,6 +19,8 @@
 ### Fixed
 
 ### Deleted
+
+- Удалено общее исключение RuStorePushException
 
 - Прекращена поддержка Laravel 10.x и более ранних версий.
 
