@@ -6,23 +6,34 @@
 
 ### Added
 
-- Добавлена детализация исключений: InvalidArgumentException, NotFoundException, etc, облегчающая обработку события
-  NotificationFailed
+- Добавлена детализация исключений для ошибочных ответов RuStore: `InvalidArgumentException`, `NotFoundException`,
+  `PermissionDeniedException`, `RuStoreInternalException`, `TooManyRequestsException`, `UnexpectedException`.
+- Добавлен `ResponseExceptionMapper`, преобразующий ошибочные HTTP-ответы RuStore в специализированные исключения.
+- Класс `RuStoreReport` дополнен методом `target()`, возвращающим ru-store-push токен, для которого сформирован отчет.
 
 ### Changed
 
-- Изменено поведение при пустом списке токенов пользователя: вместо выброса исключения RuStorePushNotingSentException
-  возвращается null, что приводит к более ожидаемому поджиганию события NotificationSent с пустой коллекцией в $event->
-  response
-- Класс RuStoreSingleReport дополнен методом target(), содержащим значение ru-store-push токена
+- **Breaking:** `RuStoreChannel::send()` и `RuStoreClient::send()` теперь возвращают коллекцию отчетов
+  `RuStoreReport` об отправке уведомления на один адрес, а не агрегирующий отчет `RuStoreReport`.
+- **Breaking:** событие `NotificationSent` теперь также содержит коллекцию успешных отчетов `RuStoreReport` об отправке уведомления на один адрес в
+  `$event->response`, а не агрегирующий объект `RuStoreReport`.
+- **Breaking:** событие `NotificationFailed` теперь поджигается отдельно для каждой неуспешной отправки и содержит один
+  отчет `RuStoreReport` об отправке уведомления на один адрес в `$event->data['report']`, а не агрегирующий объект `RuStoreReport`.
+- Изменено поведение при пустом списке токенов пользователя: вместо выброса исключения
+  `RuStorePushNotingSentException` отправка завершается пустой коллекцией в `$event->response` события
+  `NotificationSent`.
+- Изменено поведение при полностью неуспешной отправке: `NotificationSent` поджигается с пустой коллекцией успешных
+  отчетов в `$event->response`, а ошибки передаются через события `NotificationFailed`.
 
 ### Fixed
 
 ### Deleted
 
-- Удалено общее исключение RuStorePushException
-
-- Прекращена поддержка Laravel 10.x и более ранних версий.
+- **Breaking:** удален прежний агрегирующий отчет `RuStoreReport`; имя `RuStoreReport` теперь используется для отчета
+  по одному ru-store-push токену.
+- **Breaking:** удалено общее исключение `RuStorePushException`.
+- **Breaking:** удалено исключение `RuStorePushNotingSentException`; для внутренней ошибки RuStore используется
+  `RuStoreInternalException`.
 
 ## [2.0.0] - 2026-08-26
 
