@@ -9,7 +9,7 @@ use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 
 class RuStoreChannel
 {
@@ -25,7 +25,7 @@ class RuStoreChannel
      * @param mixed $notifiable
      * @param Notification $notification
      *
-     * @return Collection<int, RuStoreSingleReport>
+     * @return Collection<int, RuStoreReport>
      */
     public function send(mixed $notifiable, Notification $notification): Collection
     {
@@ -33,8 +33,8 @@ class RuStoreChannel
         $tokens = Arr::wrap($notifiable->routeNotificationForRuStore());
 
         return $this->client->send($message, $tokens)
-            ->each(fn(RuStoreSingleReport $report) => $this->dispatchFailedNotification($notifiable, $notification, $report))
-            ->filter(fn(RuStoreSingleReport $report) => $report->isSuccess())
+            ->each(fn(RuStoreReport $report) => $this->dispatchFailedNotification($notifiable, $notification, $report))
+            ->filter(fn(RuStoreReport $report) => $report->isSuccess())
             ->values();
     }
 
@@ -43,10 +43,10 @@ class RuStoreChannel
      *
      * @param mixed $notifiable
      * @param Notification $notification
-     * @param RuStoreSingleReport $report
+     * @param RuStoreReport $report
      * @return void
      */
-    private function dispatchFailedNotification(mixed $notifiable, Notification $notification, RuStoreSingleReport $report): void
+    private function dispatchFailedNotification(mixed $notifiable, Notification $notification, RuStoreReport $report): void
     {
         if ($report->isFailure()) {
             $this->events->dispatch(new NotificationFailed($notifiable, $notification, self::class, [

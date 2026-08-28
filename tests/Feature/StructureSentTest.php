@@ -8,7 +8,7 @@ use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 use NotificationChannels\RuStore\RuStoreChannel;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
@@ -50,7 +50,7 @@ class StructureSentTest extends TestCase
 
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) use ($notifiable) {
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->response->sole();
 
             return $event->channel === RuStoreChannel::class
@@ -79,10 +79,10 @@ class StructureSentTest extends TestCase
 
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) use ($notifiable, $token_1, $token_2) {
-            /** @var RuStoreSingleReport $report_1 */
-            $report_1 = $event->response->filter(fn(RuStoreSingleReport $report) => $report->target() === $token_1)->sole();
-            /** @var RuStoreSingleReport $report_2 */
-            $report_2 = $event->response->filter(fn(RuStoreSingleReport $report) => $report->target() === $token_2)->sole();
+            /** @var RuStoreReport $report_1 */
+            $report_1 = $event->response->filter(fn(RuStoreReport $report) => $report->target() === $token_1)->sole();
+            /** @var RuStoreReport $report_2 */
+            $report_2 = $event->response->filter(fn(RuStoreReport $report) => $report->target() === $token_2)->sole();
 
             return $event->channel === RuStoreChannel::class
                 && $event->response->count() === 2

@@ -11,7 +11,7 @@ use Throwable;
 /**
  * Отчет об отправке уведомления на одно из устройств пользователя
  */
-final readonly class RuStoreSingleReport
+final readonly class RuStoreReport
 {
     /**
      * @param string $target

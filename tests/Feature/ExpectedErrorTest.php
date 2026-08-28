@@ -15,7 +15,7 @@ use NotificationChannels\RuStore\Exceptions\PermissionDeniedException;
 use NotificationChannels\RuStore\Exceptions\RuStoreInternalException;
 use NotificationChannels\RuStore\Exceptions\TooManyRequestsException;
 use NotificationChannels\RuStore\Exceptions\UnexpectedException;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
 use NotificationChannels\RuStore\Test\TestNotification;
@@ -99,7 +99,7 @@ class ExpectedErrorTest extends TestCase
         Event::assertDispatched(NotificationSending::class);
         Event::assertDispatched(NotificationSent::class);
         Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable, $code, $message, $body, $e_class) {
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
 
             return [$report->target()] === $notifiable->routeNotificationForRuStore()

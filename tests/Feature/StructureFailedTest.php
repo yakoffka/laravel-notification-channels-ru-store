@@ -8,7 +8,7 @@ use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 use NotificationChannels\RuStore\RuStoreChannel;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
@@ -41,7 +41,7 @@ class StructureFailedTest extends TestCase
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatchedTimes(NotificationFailed::class, 1);
         Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable) {
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
 
             return $event->channel === RuStoreChannel::class
@@ -81,7 +81,7 @@ class StructureFailedTest extends TestCase
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatchedTimes(NotificationFailed::class, 2);
         Event::assertDispatched(static function (NotificationFailed $event) use ($token_1) {
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
 
             return $event->channel === RuStoreChannel::class
@@ -90,7 +90,7 @@ class StructureFailedTest extends TestCase
                 && $report->error()->getCode() === 404; // @todo дополнить сообщением?!
         });
         Event::assertDispatched(static function (NotificationFailed $event) use ($token_2) {
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
 
             return $event->channel === RuStoreChannel::class

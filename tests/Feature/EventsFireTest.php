@@ -9,7 +9,7 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
 use NotificationChannels\RuStore\Test\TestNotification;
@@ -59,7 +59,7 @@ class EventsFireTest extends TestCase
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) {
             // dd($event); @todo дополнить проверки!
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->response->sole();
             return $report->target() === 'example_ru_store_token';
         });
@@ -93,7 +93,7 @@ class EventsFireTest extends TestCase
         Event::assertDispatchedTimes(NotificationFailed::class, 1);
         Event::assertDispatched(static function (NotificationFailed $event) {
             // dd($event); @todo дополнить проверки!
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === 'invalid_fcm_token';
         });
@@ -121,7 +121,7 @@ class EventsFireTest extends TestCase
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) {
             // dd($event); @todo дополнить проверки!
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->response->sole();
             return $report->target() === 'example_ru_store_token';
 
@@ -129,7 +129,7 @@ class EventsFireTest extends TestCase
         Event::assertDispatchedTimes(NotificationFailed::class, 1);
         Event::assertDispatched(static function (NotificationFailed $event) {
             // dd($event); @todo дополнить проверки!
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === 'invalid_ru_store_token';
         });
@@ -165,20 +165,20 @@ class EventsFireTest extends TestCase
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) {
             $tokens = $event->response
-                ->map(fn(RuStoreSingleReport $report) => $report->target())
+                ->map(fn(RuStoreReport $report) => $report->target())
                 ->toArray();
             return $tokens === ['1_valid', '3_valid'];
         });
         Event::assertDispatchedTimes(NotificationFailed::class, 2);
         Event::assertDispatched(static function (NotificationFailed $event) {
             // dd($event); @todo дополнить проверки!
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === '2_invalid';
         });
         Event::assertDispatched(static function (NotificationFailed $event) {
             // dd($event); @todo дополнить проверки!
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === '4_invalid';
         });

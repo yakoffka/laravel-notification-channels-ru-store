@@ -8,7 +8,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 use Throwable;
 
 class RuStoreClient
@@ -32,12 +32,12 @@ class RuStoreClient
      *
      * @param RuStoreMessage $message
      * @param array<int, string> $tokens
-     * @return Collection<int, RuStoreSingleReport>
+     * @return Collection<int, RuStoreReport>
      */
     public function send(RuStoreMessage $message, array $tokens): Collection
     {
         // @todo проверить тип $token!
-        return collect($tokens)->map(fn(string $token): RuStoreSingleReport => $this->sendSingle($message, $token));
+        return collect($tokens)->map(fn(string $token): RuStoreReport => $this->sendSingle($message, $token));
     }
 
     /**
@@ -45,9 +45,9 @@ class RuStoreClient
      *
      * @param RuStoreMessage $message
      * @param string $token
-     * @return RuStoreSingleReport
+     * @return RuStoreReport
      */
-    public function sendSingle(RuStoreMessage $message, string $token): RuStoreSingleReport
+    public function sendSingle(RuStoreMessage $message, string $token): RuStoreReport
     {
         try {
             $request = Http::withToken($this->bearer_token)->withBody($message->getPayload($token));
@@ -55,11 +55,11 @@ class RuStoreClient
             $response = $request->send('POST', $this->url);
 
         } catch (Throwable $exception) {
-            return RuStoreSingleReport::failure($token, $exception); // @todo протестировать!
+            return RuStoreReport::failure($token, $exception); // @todo протестировать!
         }
 
         return $response->successful()
-            ? RuStoreSingleReport::success($token, $response)
-            : RuStoreSingleReport::failure($token, ResponseExceptionMapper::map($response), $response);
+            ? RuStoreReport::success($token, $response)
+            : RuStoreReport::failure($token, ResponseExceptionMapper::map($response), $response);
     }
 }

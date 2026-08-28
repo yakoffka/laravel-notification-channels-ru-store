@@ -10,7 +10,7 @@ use Illuminate\Notifications\Events\NotificationSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\Exceptions\UnexpectedException;
-use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
+use NotificationChannels\RuStore\Reports\RuStoreReport;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
 use NotificationChannels\RuStore\Test\TestNotification;
@@ -70,7 +70,7 @@ class UnexpectedResponseTest extends TestCase
         Event::assertDispatched(NotificationSending::class);
         Event::assertDispatched(NotificationSent::class);
         Event::assertDispatched(static function (NotificationFailed $event) use ($notifiable, $code, $body) {
-            /** @var RuStoreSingleReport $report */
+            /** @var RuStoreReport $report */
             $report = $event->data['report'];
 
             return [$report->target()] === $notifiable->routeNotificationForRuStore()
