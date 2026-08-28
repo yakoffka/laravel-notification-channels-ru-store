@@ -2,24 +2,21 @@
 
 declare(strict_types=1);
 
-namespace NotificationChannels\RuStore\Test\Notifiable;
+namespace NotificationChannels\RuStore\Test;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
-class User extends Authenticatable
+class TestNotifiableModel extends Authenticatable
 {
     use Notifiable;
 
-    // public $timestamps = false;
-
-    // protected $fillable = ['email'];
-
     private ?array $tokens = null;
 
-    public function setTokens(array $tokens): self
+    public function setTokens(?array $tokens = null): self
     {
-        $this->tokens = $tokens;
+        $this->tokens = $tokens ?? [Str::random(32)];
 
         return $this;
     }
@@ -36,7 +33,6 @@ class User extends Authenticatable
      */
     public function routeNotificationForRuStore(): array
     {
-        // return $this->tokens ?? [env('RUSTORE_EXAMPLE_PUSH_TOKEN', 'none')];
-        return $this->tokens ?? ['random-SGvffRwHWP1wx8a28crwU7ol4'];
+        return $this->tokens ?? [];
     }
 }

@@ -9,7 +9,6 @@ use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
 use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 
 class RuStoreChannel
@@ -27,7 +26,6 @@ class RuStoreChannel
      * @param Notification $notification
      *
      * @return Collection<int, RuStoreSingleReport>
-     * @throws RuStorePushNotingSentException
      */
     public function send(mixed $notifiable, Notification $notification): Collection
     {

@@ -56,7 +56,7 @@ class RuStoreClient
             $response = $request->send('POST', $this->url);
 
         } catch (Throwable $exception) {
-            return RuStoreSingleReport::failure($token, $exception);
+            return RuStoreSingleReport::failure($token, $exception); // @todo протестировать!
         }
 
         return $response->successful()

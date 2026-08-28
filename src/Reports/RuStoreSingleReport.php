@@ -21,7 +21,7 @@ final readonly class RuStoreSingleReport
     public function __construct(
         private string                         $target,
         private PromiseInterface|Response|null $response = null,
-        private ?Throwable                 $error = null,
+        private ?Throwable                     $error = null,
     ) {}
 
     /**
