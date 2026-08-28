@@ -14,6 +14,7 @@ use NotificationChannels\RuStore\Exceptions\NotFoundException;
 use NotificationChannels\RuStore\Exceptions\PermissionDeniedException;
 use NotificationChannels\RuStore\Exceptions\RuStoreInternalException;
 use NotificationChannels\RuStore\Exceptions\TooManyRequestsException;
+use NotificationChannels\RuStore\Exceptions\UnexpectedException;
 use NotificationChannels\RuStore\Reports\RuStoreSingleReport;
 use NotificationChannels\RuStore\Test\TestCase;
 use NotificationChannels\RuStore\Test\TestNotifiableModel;
@@ -67,13 +68,19 @@ class ExpectedErrorTest extends TestCase
                 'NOT_FOUND',
                 NotFoundException::class,
             ],
+            [
+                599,
+                'Неописанный статус, но структура ответа соответствует заявленной',
+                'UNDEFINED_STATUS',
+                UnexpectedException::class,
+            ],
         ];
     }
 
     #[Test]
     #[TestDox('Проверка обработки ответа на запрос с невалидным push-токеном 400|INVALID_ARGUMENT')]
     #[DataProvider('expectedErrorProvider')]
-    public function statusCode400InvalidArgument(int $code, string $message, string $status, string $e_class): void
+    public function expectedError(int $code, string $message, string $status, string $e_class): void
     {
         Event::fake();
         $body = [
@@ -99,7 +106,9 @@ class ExpectedErrorTest extends TestCase
                 && $report->isFailure()
                 && $report->error()::class === $e_class
                 && $report->error()->getCode() === $code
-                && $report->error()->getMessage() === $message
+                && $report->error()->getMessage() === ($e_class === UnexpectedException::class
+                    ? json_encode($body, JSON_THROW_ON_ERROR)
+                    : $message)
                 && $report->response()->getStatusCode() === $code
                 && $report->response()->body() === json_encode($body, JSON_THROW_ON_ERROR);
         });

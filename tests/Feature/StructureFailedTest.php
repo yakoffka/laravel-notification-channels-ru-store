@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 
 /**
- * Проверка структуры событий NotificationFailed
+ * Проверка структуры отчета события NotificationFailed ($event->data['report'])
  */
 class StructureFailedTest extends TestCase
 {

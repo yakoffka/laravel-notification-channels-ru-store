@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 
 /**
- * Проверка структуры событий NotificationSent
+ * Проверка структуры отчета события NotificationSent ($event->data['report'])
  */
 class StructureSentTest extends TestCase
 {

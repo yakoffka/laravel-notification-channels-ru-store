@@ -63,6 +63,6 @@ class ResponseExceptionMapper
         //     return new ServerErrorException($response);
         // }
 
-        return new UnexpectedException($response->body(), $code); // @todo протестировать!
+        return new UnexpectedException($response->body(), $code);
     }
 }
