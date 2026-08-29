@@ -42,15 +42,16 @@ This package makes it easy to send notifications using [RuStore](link to service
 В классе, использующим трейт Notifiable (например User), необходимо реализовать метод, возвращающий массив токенов уведомляемого пользователя:
 
 ```php
+
     /**
-     * Получение массива ru-store-push токенов пользователя.
+     * Получение массива ru-store push-токенов пользователя.
      * Используется пакетом yakoffka/laravel-notification-channels-ru-store (laravel-notification-channels/rustore)
      *
-     * @return array
+     * @return array<int|string, mixed>
      */
     public function routeNotificationForRuStore(): array
     {
-        return $this->ru_store_tokens;
+        return $this->rustore_push_tokens;
     }
 ```
 
@@ -127,11 +128,13 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
 
 
 #### Проверка отправки уведомлений
-Для контроля отправляемых уведомлений можно воспользоваться событиями, поджигаемыми после отправки:
-- cобытие NotificationSent содержит коллекцию отчетов RuStoreSingleReport в свойстве response: ```$report = $event->response;```
-- cобытие NotificationFailed содержит коллекцию отчетов RuStoreSingleReport в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
+Для контроля отправляемых уведомлений необходимо воспользоваться событиями, поджигаемыми после отправки:
+- cобытие NotificationSent содержит коллекцию отчетов RuStoreReport в свойстве response: ```$report = $event->response;```
+- cобытие NotificationFailed содержит единичный отчет RuStoreReport в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
 
-Коллекция отчетов RuStoreSingleReport содержит данные об отправке уведомлений на конкретное устройство с push-токенами в качестве ключей
+Отчет RuStoreReport имеет публичный метод target(), возвращающий значение ru-store push токена, на который производилась отправка.
+
+##### Обработка события успешной отправки
 
 Пример использования события NotificationSent:
 ```php
@@ -153,24 +156,26 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
      */
     public function handleRuStoreSuccess(NotificationSent $event): void
     {
-        /** @var RuStoreReport $report */ // @todo исправить!
-        $report = $event->response;
+        /** @var Collection<string, RuStoreReport> $reports */
+        $reports = $event->response;
 
-        $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {
-            /** @var Response $response */
-            $response = $singleReport->response();
-            Log::channel('notifications')->info('RuStoreSuccess Уведомление успешно отправлено', [
-                'user' => $event->notifiable->short_info,
-                'token' => $token,
-                'message' => $report->getMessage()->toArray(),
-                'response_status' => $response->status(),
+        $tokens = $reports->map(fn(RuStoreReport $singleReport) => $singleReport->target());
+        if ($tokens->isNotEmpty()) {
+            /** @var NotifiableUser $notifiable */
+            $notifiable = $event->notifiable;
+
+            Log::channel('notifications_ru_store')->info("Успешно отправлены уведомления {$notifiable->short_info}", [
+                'tokens' =>  $tokens->toArray(),
             ]);
-        });
+        }
     }
 
 ```
-NOTE: Событие NotificationSent поджигается только в случае наличия успешно отправленных сообщений.
+NOTE: Событие NotificationSent поджигается всегда, даже в случае отсутствия успешно отправленных сообщений. Индикатором
+успешной отправки является непустая коллекция отчетов.
 
+
+##### Обработка события неуспешной отправки
 
 Пример использования события NotificationFailed:
 ```php
@@ -185,35 +190,37 @@ NOTE: Событие NotificationSent поджигается только в с�
     }
 
     /**
-     * Обработка неудачных отправок уведомлений через канал RuStore
+     * Обработка неудачной отправки ru-store-уведомлений
      *
      * @param NotificationFailed $event
      * @return void
      */
     private function handleRuStoreFailed(NotificationFailed $event): void
     {
-        /** @var RuStoreReport $report */ // @todo исправить!
-        $report = Arr::get($event->data, 'report');
+        /** @var RuStoreReport $report */
+        $report = Arr::get($event->data, 'report'); // @todo $report может быть null: падение до отправки!
+        /** @var Throwable $e */
+        $e = $report->error();
+        /** @var NotifiableUser $notifiable */
+        $notifiable = $event->notifiable;
 
-        $report->all()->each(function (RuStoreSingleReport $singleReport, string $token) use ($report, $event): void {
-            $e = $singleReport->error();
-            Log::channel('notifications')->error('RuStoreFailed Ошибка отправки уведомления', [
-                'user' => $event->notifiable->short_info,
-                'token' => $token,
-                'message' => $report->getMessage()->toArray(),
-                'error_code' => $e->getCode(),
-                'error_message' => $e->getMessage(),
-            ]);
-        });
+        Log::channel('notifications_ru_store')
+            ->error("Ошибка отправки уведомления {$notifiable->short_info} " . $e::class, compact('event'));
+
+        if ($e::class === NotFoundException::class || $e::class === InvalidPushTokenException::class) {
+            resolve(RuStorePushService::class)->deleteRuStoreToken($notifiable, $report->target(), $e);
+        }
     }
 
 ```
 NOTE: Событие NotificationFailed поджигается только в случае наличия хотя-бы одной неуспешной отправки.
+NOTE: В случае, если было выброшено исключение NotFoundException или InvalidPushTokenException, необходимо отозвать
+невалидный/недействующий токен.
 
 
 ### Available Message methods
 
-Сообщение поддерживает все свойства, описанные в [документации](https://www.rustore.ru/help/sdk/push-notifications/send-push-notifications)
+Сообщение RuStoreMessage поддерживает все свойства, описанные в [документации rustore](https://www.rustore.ru/help/sdk/push-notifications/send-push-notifications)
 
 ## Changelog
 
@@ -229,14 +236,16 @@ $ composer test
 
 If you discover any security related issues, please email yagithub@mail.ru instead of using the issue tracker.
 
-## Contributing
+[//]: # (## Contributing)
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+[//]: # ()
+[//]: # (Please see [CONTRIBUTING]&#40;CONTRIBUTING.md&#41; for details.)
 
 ## Credits
 
 - [yakOffKa](https://github.com/yakoffka)
-- [All Contributors](../../contributors)
+
+[//]: # (- [All Contributors]&#40;../../contributors&#41;)
 
 ## License
 
