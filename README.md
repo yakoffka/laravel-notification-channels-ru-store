@@ -1,9 +1,9 @@
-Please see [this repo](https://github.com/laravel-notification-channels/channels) for instructions on how to submit a channel proposal.
+Please see [this repo](https://github.com/laravel-notification-channels/channels) for instructions on how to submit a
+channel proposal.
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 This package makes it easy to send notifications using [RuStore](link to service) with Laravel .
-
 
 ## Contents
 
@@ -24,22 +24,26 @@ This package makes it easy to send notifications using [RuStore](link to service
 - PHP >= 8.2
 - Laravel / Illuminate >= 11.0
 
-
 ## Installation
+
 Установите пакет с помощью команды:
+
 ```bash
   composer require yakoffka/laravel-notification-channels-ru-store
 ```
 
 Опубликуйте конфигурационный файл:
+
 ```bash
   php artisan vendor:publish --provider="NotificationChannels\RuStore\RuStoreServiceProvider"
 ```
+
 Обновите ваш .env, указав там значения, полученные в [RuStore консоли](https://console.rustore.ru/waiting)
 
 ## Usage
 
-В классе, использующим трейт Notifiable (например User), необходимо реализовать метод, возвращающий массив токенов уведомляемого пользователя:
+В классе, использующим трейт Notifiable (например User), необходимо реализовать метод, возвращающий массив токенов
+уведомляемого пользователя:
 
 ```php
 
@@ -55,7 +59,9 @@ This package makes it easy to send notifications using [RuStore](link to service
     }
 ```
 
-Затем создать класс уведомления, в методе via() которого указать канал отправки RuStoreChannel и добавить метод toRuStore():
+Затем создать класс уведомления, в методе via() которого указать канал отправки RuStoreChannel и добавить метод
+toRuStore():
+
 ```php
 <?php
 declare(strict_types=1);
@@ -126,17 +132,22 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
 
 ```
 
-
 #### Проверка отправки уведомлений
-Для контроля отправляемых уведомлений необходимо воспользоваться событиями, поджигаемыми после отправки:
-- cобытие NotificationSent содержит коллекцию отчетов RuStoreReport в свойстве response: ```$report = $event->response;```
-- cобытие NotificationFailed содержит единичный отчет RuStoreReport в свойстве data['report']: ```$report = Arr::get($event->data, 'report');```
 
-Отчет RuStoreReport имеет публичный метод target(), возвращающий значение ru-store push токена, на который производилась отправка.
+Для контроля отправляемых уведомлений необходимо воспользоваться событиями, поджигаемыми после отправки:
+
+- cобытие NotificationSent содержит коллекцию отчетов RuStoreReport в свойстве response:
+  ```$report = $event->response;```
+- cобытие NotificationFailed содержит единичный отчет RuStoreReport в свойстве data['report']:
+  ```$report = Arr::get($event->data, 'report');```
+
+Отчет RuStoreReport имеет публичный метод target(), возвращающий значение ru-store push токена, на который производилась
+отправка.
 
 ##### Обработка события успешной отправки
 
 Пример использования события NotificationSent:
+
 ```php
     // class SentListener
 
@@ -171,13 +182,14 @@ class RuStoreTestNotification extends Notification implements ShouldQueue
     }
 
 ```
+
 NOTE: Событие NotificationSent поджигается всегда, даже в случае отсутствия успешно отправленных сообщений. Индикатором
 успешной отправки является непустая коллекция отчетов.
-
 
 ##### Обработка события неуспешной отправки
 
 Пример использования события NotificationFailed:
+
 ```php
     // class FailedSendingListener
 
@@ -213,14 +225,15 @@ NOTE: Событие NotificationSent поджигается всегда, да�
     }
 
 ```
+
 NOTE: Событие NotificationFailed поджигается только в случае наличия хотя-бы одной неуспешной отправки.
 NOTE: В случае, если было выброшено исключение NotFoundException или InvalidPushTokenException, необходимо отозвать
 невалидный/недействующий токен.
 
-
 ### Available Message methods
 
-Сообщение RuStoreMessage поддерживает все свойства, описанные в [документации rustore](https://www.rustore.ru/help/sdk/push-notifications/send-push-notifications)
+Сообщение RuStoreMessage поддерживает все свойства, описанные
+в [документации rustore](https://www.rustore.ru/help/sdk/push-notifications/send-push-notifications)
 
 ## Changelog
 
@@ -239,6 +252,7 @@ If you discover any security related issues, please email yagithub@mail.ru inste
 [//]: # (## Contributing)
 
 [//]: # ()
+
 [//]: # (Please see [CONTRIBUTING]&#40;CONTRIBUTING.md&#41; for details.)
 
 ## Credits
