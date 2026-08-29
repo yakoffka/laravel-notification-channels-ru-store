@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NotificationChannels\RuStore\Test\Notifications;
+namespace NotificationChannels\RuStore\Test;
 
 use Illuminate\Notifications\Notification;
 use NotificationChannels\RuStore\Resources\MessageAndroid;

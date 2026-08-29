@@ -4,101 +4,95 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Reports;
 
-use Illuminate\Support\Collection;
-use NotificationChannels\RuStore\Exceptions\RuStorePushNotingSentException;
-use NotificationChannels\RuStore\RuStoreMessage;
+use GuzzleHttp\Promise\PromiseInterface;
+use Illuminate\Http\Client\Response;
+use Throwable;
 
 /**
- * Отчет об отправке уведомлений на все устройства пользователя
+ * Отчет об отправке уведомления на одно из устройств пользователя
  */
-final class RuStoreReport
+final readonly class RuStoreReport
 {
     /**
-     * @param Collection $reports Коллекция отчетов об отправке уведомлений с push-токенами в качестве ключей
-     * @param RuStoreMessage $message Отправляемое сообщение
+     * @param string $target
+     * @param PromiseInterface|Response|null $response
+     * @param Throwable|null $error
      */
     public function __construct(
-        private Collection              $reports,
-        private readonly RuStoreMessage $message,
+        private string                         $target,
+        private PromiseInterface|Response|null $response = null,
+        private ?Throwable                     $error = null,
     ) {}
 
     /**
-     * Инициализация объекта
+     * Создание успешного отчета
      *
-     * @param array $tokens
-     * @param RuStoreMessage $message
+     * @param string $target
+     * @param PromiseInterface|Response $response
      * @return self
      */
-    public static function init(array $tokens, RuStoreMessage $message): self
+    public static function success(string $target, PromiseInterface|Response $response): self
     {
         return new self(
-            reports: collect(array_combine($tokens, array_fill(0, count($tokens), null))),
-            message: $message,
+            target: $target,
+            response: $response,
         );
     }
 
     /**
-     * Получение коллекции отчетов
+     * Создание отчета об ошибке
      *
-     * @return Collection<RuStoreSingleReport>
-     */
-    public function all(): Collection
-    {
-        return $this->reports;
-    }
-
-    /**
-     * Добавление отчета об отправке уведомления адресату $token
-     *
-     * @param string $token
-     * @param RuStoreSingleReport $report
+     * @param string $target
+     * @param Throwable $error
+     * @param PromiseInterface|Response|null $response
      * @return self
      */
-    public function addReport(string $token, RuStoreSingleReport $report): self
+    public static function failure(string $target, Throwable $error, PromiseInterface|Response|null $response = null): self
     {
-        $this->reports->put($token, $report);
-
-        return $this;
+        return new self(
+            target: $target,
+            response: $response,
+            error: $error,
+        );
     }
 
     /**
-     * Получение отчета об успешных отправках
-     *
-     * @return RuStoreReport
-     * @throws RuStorePushNotingSentException
+     * @return bool
      */
-    public function getSuccess(): self
+    public function isSuccess(): bool
     {
-        $success = clone $this;
-        $success->reports = $this->reports->filter(fn(RuStoreSingleReport $report) => $report->isSuccess());
-
-        if ($success->reports->count() === 0) {
-            throw new RuStorePushNotingSentException();
-        }
-
-        return $success;
+        return $this->error === null;
     }
 
     /**
-     * Получение отчета об ошибочных отправках
-     *
-     * @return RuStoreReport
+     * @return bool
      */
-    public function getFailure(): self
+    public function isFailure(): bool
     {
-        $failure = clone $this;
-        $failure->reports = $this->reports->filter(fn(RuStoreSingleReport $report) => $report->isFailure());
-
-        return $failure;
+        return ! $this->isSuccess();
     }
 
     /**
-     * Получение отправляемого сообщения
-     *
-     * @return RuStoreMessage
+     * @return string
      */
-    public function getMessage(): RuStoreMessage
+    public function target(): string
     {
-        return $this->message;
+        return $this->target;
+    }
+
+    /**
+     * @return PromiseInterface|Response|null
+     */
+    public function response(): PromiseInterface|Response|null
+    {
+        return $this->response;
+    }
+
+    /**
+     * @return Throwable|null
+     */
+    public function error(): ?Throwable
+    {
+        return $this->error;
     }
 }

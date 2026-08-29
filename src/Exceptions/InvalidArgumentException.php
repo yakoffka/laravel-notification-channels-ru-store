@@ -7,7 +7,10 @@ namespace NotificationChannels\RuStore\Exceptions;
 use Exception;
 use Throwable;
 
-class RuStorePushNotingSentException extends Exception
+/**
+ * Ответ на запрос с невалидным push-токеном
+ */
+class InvalidArgumentException extends Exception
 {
     /**
      * @param string $message
@@ -16,8 +19,6 @@ class RuStorePushNotingSentException extends Exception
      */
     public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
     {
-        $message = $message === '' ? 'Noting sent' : $message;
-
         parent::__construct($message, $code, $previous);
     }
 }

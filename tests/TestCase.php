@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace NotificationChannels\RuStore\Test;
 
+use Illuminate\Support\Facades\Http;
 use NotificationChannels\RuStore\RuStoreServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
-    protected string $url = '';
+    protected string $url = 'https://vkpns.rustore.ru/*';
 
     /**
      * Setup the test environment.
@@ -19,11 +20,10 @@ abstract class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
+        Http::preventStrayRequests();
 
-        // $this->app['config']->set('ru-store.project_id', env('RUSTORE_PROJECT_ID', 'test'));
-        // $this->app['config']->set('ru-store.token', env('RUSTORE_TOKEN', 'test'));
-        $this->app['config']->set('ru-store.project_id', 'Rx8IE0g5r-6-zhjWN0IixVacYM1TMI8q');
-        $this->app['config']->set('ru-store.token', 'jd447ZsYdcAIy29XJSQZXEmlr8at4VWgtGka225CxSqGIo-qfI4IQx0WHWhmRguJ');
+        $this->app['config']->set('ru-store.project_id', 'test_ru-store_project_id');
+        $this->app['config']->set('ru-store.token', 'test_ru-store_token');
     }
 
     /**
