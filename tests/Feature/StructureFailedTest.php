@@ -47,7 +47,7 @@ class StructureFailedTest extends TestCase
             return $event->channel === RuStoreChannel::class
                 && [$report->target()] === $notifiable->routeNotificationForRuStore()
                 && $report->isFailure()
-                && $report->error()->getCode() === 404; // @todo дополнить сообщением?!
+                && $report->error()->getCode() === 404;
         });
     }
 
@@ -87,7 +87,7 @@ class StructureFailedTest extends TestCase
             return $event->channel === RuStoreChannel::class
                 && $report->target() === $token_1
                 && $report->isFailure()
-                && $report->error()->getCode() === 404; // @todo дополнить сообщением?!
+                && $report->error()->getCode() === 404;
         });
         Event::assertDispatched(static function (NotificationFailed $event) use ($token_2) {
             /** @var RuStoreReport $report */
@@ -96,7 +96,7 @@ class StructureFailedTest extends TestCase
             return $event->channel === RuStoreChannel::class
                 && $report->target() === $token_2
                 && $report->isFailure()
-                && $report->error()->getCode() === 400; // @todo дополнить сообщением?!
+                && $report->error()->getCode() === 400;
         });
     }
 }

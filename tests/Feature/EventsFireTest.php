@@ -37,8 +37,6 @@ class EventsFireTest extends TestCase
             $response = $event->response;
             return $response->toArray() === [];
         });
-        // Event::assertDispatched(static fn(NotificationSent $event) => $event->response->all() === []
-        //     && $event->notifiable === $notifiable);
         Event::assertNotDispatched(NotificationFailed::class);
     }
 
@@ -53,12 +51,8 @@ class EventsFireTest extends TestCase
 
         $notifiable->notify($notification);
 
-        // Event::assertDispatched(static function (NotificationSent $event) {
-        //     return $event->response->keys()->toArray() === ['example_ru_store_token'];
-        // });
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) {
-            // dd($event); @todo дополнить проверки!
             /** @var RuStoreReport $report */
             $report = $event->response->sole();
             return $report->target() === 'example_ru_store_token';
@@ -68,7 +62,6 @@ class EventsFireTest extends TestCase
 
     #[Test]
     #[TestDox('Ошибочная отправка уведомления на одно устройство. NotificationSent поджигается, но response->reports пуст')]
-    // @todo дополнить всеми возможными типами ошибок (сервер, соединение, клиентские[исключение при получении токенов?])
     public function eventsFireOnOnlyOneFail(): void
     {
         Event::fake();
@@ -92,7 +85,6 @@ class EventsFireTest extends TestCase
         });
         Event::assertDispatchedTimes(NotificationFailed::class, 1);
         Event::assertDispatched(static function (NotificationFailed $event) {
-            // dd($event); @todo дополнить проверки!
             /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === 'invalid_fcm_token';
@@ -120,7 +112,6 @@ class EventsFireTest extends TestCase
 
         Event::assertDispatchedTimes(NotificationSent::class, 1);
         Event::assertDispatched(static function (NotificationSent $event) {
-            // dd($event); @todo дополнить проверки!
             /** @var RuStoreReport $report */
             $report = $event->response->sole();
             return $report->target() === 'example_ru_store_token';
@@ -128,7 +119,6 @@ class EventsFireTest extends TestCase
         });
         Event::assertDispatchedTimes(NotificationFailed::class, 1);
         Event::assertDispatched(static function (NotificationFailed $event) {
-            // dd($event); @todo дополнить проверки!
             /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === 'invalid_ru_store_token';
@@ -171,13 +161,11 @@ class EventsFireTest extends TestCase
         });
         Event::assertDispatchedTimes(NotificationFailed::class, 2);
         Event::assertDispatched(static function (NotificationFailed $event) {
-            // dd($event); @todo дополнить проверки!
             /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === '2_invalid';
         });
         Event::assertDispatched(static function (NotificationFailed $event) {
-            // dd($event); @todo дополнить проверки!
             /** @var RuStoreReport $report */
             $report = $event->data['report'];
             return $report->target() === '4_invalid';

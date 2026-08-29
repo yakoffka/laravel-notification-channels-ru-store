@@ -58,10 +58,8 @@ class RuStoreClient
             /** @var PromiseInterface|Response $response */
             $response = $request->send('POST', $this->url);
 
-        } catch (InvalidPushTokenException $exception) {
+        } catch (InvalidPushTokenException|Throwable $exception) {
             return RuStoreReport::failure($this->reportTarget($token), $exception);
-        } catch (Throwable $exception) {
-            return RuStoreReport::failure($this->reportTarget($token), $exception); // @todo протестировать!
         }
 
         return $response->successful()
